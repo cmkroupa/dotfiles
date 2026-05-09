@@ -27,6 +27,11 @@ alias reload='source ~/.bashrc'
 alias rg='rg --smart-case'                   
 alias rgf='rg --files | rg'                
 
+alias path='echo $PATH | tr ":" "\n"'
+
+alias speedtest='curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -'
+
+
 gl() {
   git log --oneline -${1:-10}
 }
@@ -91,3 +96,49 @@ remove() {
   fi
 }
 
+
+weather() {
+  curl "wttr.in/${1:-Toronto}?format=3"
+}
+weatherfull() {
+  curl "wttr.in/${1:-Toronto}"
+}
+
+explain() {
+  curl "cheat.sh/$1"
+}
+
+randpword() {
+  tr -dc 'A-Za-z0-9!@#$%^&*' < /dev/urandom | head -c ${1:-20}; echo
+}
+
+copyfile() {
+  cat "$1" | wl-copy
+}
+
+mkcd() {
+  mkdir -p "$1" && cd "$1"
+}
+
+extract() {
+  case "$1" in
+    *.tar.gz)  tar xzf "$1" ;;
+    *.tar.bz2) tar xjf "$1" ;;
+    *.zip)     unzip "$1" ;;
+    *.gz)      gunzip "$1" ;;
+    *.rar)     unrar x "$1" ;;
+    *.7z)      7z x "$1" ;;
+    *)         echo "unknown archive format" ;;
+  esac
+}
+
+dload() {
+  curl -L --progress-bar -O "$1"
+}
+# usage: dload https://example.com/file.zip
+
+ask() {
+  curl -s http://localhost:11434/api/generate \
+    -d "{\"model\": \"qwen2.5-coder:14b\", \"prompt\": \"$*\", \"stream\": false}" \
+    | python3 -c "import sys,json; print(json.load(sys.stdin)['response'])"
+}
