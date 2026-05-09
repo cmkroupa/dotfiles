@@ -16,7 +16,7 @@ return {
 			matchup = { enable = false },
 		},
 		config = function(_, opts)
-			require("nvim-treesitter.configs").setup(opts)
+			require("nvim-treesitter").setup(opts)
 		end,
 	},
 	-- shows current function/class at top when scrolled past it

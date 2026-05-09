@@ -4,25 +4,37 @@ DOTFILES="$HOME/dotfiles"
 
 echo "Setting up symlinks..."
 
-rm -f "$HOME/.bash_aliases"
-rm -f "$HOME/.tmux.conf"
-rm -f "$HOME/.config/nvim"
+# Ensure config directory exists
+mkdir -p "$HOME/.config"
 
+# Clean up existing links or directories
+rm -rf "$HOME/.bash_aliases"
+rm -rf "$HOME/.tmux.conf"
+rm -rf "$HOME/.config/nvim"
+
+# Create symlinks using absolute paths
 ln -sf "$DOTFILES/.bash_aliases" "$HOME/.bash_aliases"
 ln -sf "$DOTFILES/.tmux.conf" "$HOME/.tmux.conf"
 ln -sf "$DOTFILES/nvim" "$HOME/.config/nvim"
 
-# bash
-if [ -f "$HOME/.bashrc" ]; then
-  grep -q "source ~/dotfiles/.bash_aliases" "$HOME/.bashrc" || \
-    echo "source ~/dotfiles/.bash_aliases" >> "$HOME/.bashrc"
-fi
+# Helper to inject source command
+inject_source() {
+    local rc_file="$1"
+    if [ -f "$rc_file" ]; then
+        grep -q "source $DOTFILES/.bash_aliases" "$rc_file" || \
+        echo "source $DOTFILES/.bash_aliases" >> "$rc_file"
+    fi
+}
 
-# zsh (mac)
-if [ -f "$HOME/.zshrc" ]; then
-  grep -q "source ~/dotfiles/.bash_aliases" "$HOME/.zshrc" || \
-    echo "source ~/dotfiles/.bash_aliases" >> "$HOME/.zshrc"
-fi
+# Update both shell configs if they exist
+inject_source "$HOME/.bashrc"
+inject_source "$HOME/.zshrc"
 
 echo "Done."
-echo "Run: source ~/.bashrc"
+
+# Detect active shell to give the right instruction
+if [[ "$SHELL" == *"zsh"* ]]; then
+    echo "Run: source ~/.zshrc"
+else
+    echo "Run: source ~/.bashrc"
+fi
