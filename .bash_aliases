@@ -6,22 +6,16 @@ alias ....='cd ../../..'
 alias home='cd ~'
 alias dotfiles='cd ~/dotfiles'
 
-alias rm='rm -i'
-alias mv='mv -i'
+alias rm='trash'
+alias rmforce='rm -rf'
 
 alias gst='git status'
-alias ga='git add'
-alias gc='git commit -m'
-alias gb='git branch'
+alias gad='git add'
+alias gcm='git commit -m'
+alias gph='git push'
+alias gfh='git fetch'
+alias gbr='git branch'
 alias gsw='git switch'
-
-gl() {
-  git log --oneline -${1:-10}
-}
-
-glg() {
-  git log --oneline --graph --decorate -${1:-20}
-}
 
 alias v='nvim'
 alias vi='nvim'
@@ -30,6 +24,16 @@ alias vim='nvim'
 alias cls='clear'
 alias reload='source ~/.bashrc'
 
+alias rg='rg --smart-case'                   
+alias rgf='rg --files | rg'                
+
+gl() {
+  git log --oneline -${1:-10}
+}
+
+glg() {
+  git log --oneline --graph --decorate -${1:-20}
+}
 
 update() {
   if command -v pacman &>/dev/null; then
@@ -47,11 +51,11 @@ update() {
 
 install() {
   if command -v pacman &>/dev/null; then
-    sudo pacman -S "$@"
+    sudo pacman -S --noconfirm "$@"
   elif command -v apt &>/dev/null; then
-    sudo apt install "$@"
+    sudo apt install -y "$@"
   elif command -v dnf &>/dev/null; then
-    sudo dnf install "$@"
+    sudo dnf install -y "$@"
   elif command -v brew &>/dev/null; then
     brew install "$@"
   else
@@ -73,5 +77,17 @@ search() {
   fi
 }
 
-alias rg='rg --smart-case'                   
-alias rgf='rg --files | rg'                
+remove() {
+  if command -v pacman &>/dev/null; then
+    sudo pacman -Rns "$@"
+  elif command -v apt &>/dev/null; then
+    sudo apt remove -y "$@"
+  elif command -v dnf &>/dev/null; then
+    sudo dnf remove -y "$@"
+  elif command -v brew &>/dev/null; then
+    brew uninstall "$@"
+  else
+    echo "no package manager found"
+  fi
+}
+
