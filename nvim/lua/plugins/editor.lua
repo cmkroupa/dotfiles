@@ -13,6 +13,7 @@ return {
 			ensure_installed = { "python", "rust", "c", "cpp", "ruby", "lua", "vim", "vimdoc" },
 			highlight = { enable = true },
 			indent = { enable = true },
+			matchup = { enable = false },
 		},
 		config = function(_, opts)
 			require("nvim-treesitter.configs").setup(opts)
@@ -38,6 +39,11 @@ return {
 	-- better % jumping for Ruby def/end, if/endif etc
 	{
 		"andymass/vim-matchup",
-		opts = {},
+		opts = {
+			matchup = {
+				enable = true,
+				disable_virtual_text = true,
+			},
+		},
 	},
 }

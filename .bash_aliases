@@ -72,3 +72,6 @@ search() {
     echo "no package manager found"
   fi
 }
+
+alias rg='rg --smart-case'                   
+alias rgf='rg --files | rg'                
