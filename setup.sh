@@ -4,6 +4,10 @@ DOTFILES="$HOME/dotfiles"
 
 echo "Setting up symlinks..."
 
+rm -f "$HOME/.bash_aliases"
+rm -f "$HOME/.tmux.conf"
+rm -f "$HOME/.config/nvim"
+
 ln -sf "$DOTFILES/.bash_aliases" "$HOME/.bash_aliases"
 ln -sf "$DOTFILES/.tmux.conf" "$HOME/.tmux.conf"
 ln -sf "$DOTFILES/nvim" "$HOME/.config/nvim"
@@ -20,8 +24,5 @@ if [ -f "$HOME/.zshrc" ]; then
     echo "source ~/dotfiles/.bash_aliases" >> "$HOME/.zshrc"
 fi
 
-
-
 echo "Done."
-
 echo "Run: source ~/.bashrc"
