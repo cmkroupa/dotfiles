@@ -19,10 +19,6 @@ ln -sf "$DOTFILES/.bash_aliases" "$HOME/.bash_aliases"
 ln -sf "$DOTFILES/.tmux.conf" "$HOME/.tmux.conf"
 ln -sf "$DOTFILES/nvim" "$HOME/.config/nvim"
 
-# Symlink rag script and make executable
-ln -sf "$DOTFILES/rag.py" "$DOTFILES/bin/rag"
-chmod +x "$DOTFILES/rag.py"
-
 # Helper to inject source command
 inject_source() {
     local rc_file="$1"
