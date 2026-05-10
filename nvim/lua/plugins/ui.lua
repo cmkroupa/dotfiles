@@ -51,5 +51,18 @@ return {
 		opts = {},
 	},
 	-- which-key
-	{ "folke/which-key.nvim", opts = {} },
+	{
+		"folke/which-key.nvim",
+		opts = {
+			spec = {
+				{ "<leader>a", group = "AI" },
+				{ "<leader>f", group = "Find" },
+				{ "<leader>b", group = "Buffers" },
+				{ "<leader>s", group = "Splits/Search" },
+				{ "<leader>x", group = "Diagnostics" },
+				{ "<leader>g", group = "Git" },
+				{ "<leader>l", group = "Lazy" },
+			},
+		},
+	},
 }

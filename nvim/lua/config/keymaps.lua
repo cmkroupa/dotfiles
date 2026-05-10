@@ -38,6 +38,11 @@ map("n", "<leader>xb", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", { des
 -- git
 map("n", "<leader>gg", "<cmd>LazyGit<cr>", { desc = "LazyGit" })
 
+-- lazy
+map("n", "<leader>ll", "<cmd>Lazy<cr>", { desc = "Lazy" })
+map("n", "<leader>lu", "<cmd>Lazy update<cr>", { desc = "Update plugins" })
+map("n", "<leader>ls", "<cmd>Lazy sync<cr>", { desc = "Sync plugins" })
+
 -- search/replace
 map("n", "<leader>sr", "<cmd>Spectre<cr>", { desc = "Search & replace" })
 
