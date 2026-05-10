@@ -62,6 +62,7 @@ return {
 				{ "<leader>x", group = "Diagnostics" },
 				{ "<leader>g", group = "Git" },
 				{ "<leader>l", group = "Lazy" },
+				{ "<leader>t", group = "Terminal" },
 			},
 		},
 	},
