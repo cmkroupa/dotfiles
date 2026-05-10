@@ -6,16 +6,22 @@ echo "Setting up symlinks..."
 
 # Ensure config directory exists
 mkdir -p "$HOME/.config"
+mkdir -p "$DOTFILES/bin"
 
 # Clean up existing links or directories
 rm -rf "$HOME/.bash_aliases"
 rm -rf "$HOME/.tmux.conf"
 rm -rf "$HOME/.config/nvim"
+rm -f "$DOTFILES/bin/rag"
 
 # Create symlinks using absolute paths
 ln -sf "$DOTFILES/.bash_aliases" "$HOME/.bash_aliases"
 ln -sf "$DOTFILES/.tmux.conf" "$HOME/.tmux.conf"
 ln -sf "$DOTFILES/nvim" "$HOME/.config/nvim"
+
+# Symlink rag script and make executable
+ln -sf "$DOTFILES/rag.py" "$DOTFILES/bin/rag"
+chmod +x "$DOTFILES/rag.py"
 
 # Helper to inject source command
 inject_source() {
@@ -26,9 +32,20 @@ inject_source() {
     fi
 }
 
+# Helper to inject PATH
+inject_path() {
+    local rc_file="$1"
+    if [ -f "$rc_file" ]; then
+        grep -q "$DOTFILES/bin" "$rc_file" || \
+        echo "export PATH=\"$DOTFILES/bin:\$PATH\"" >> "$rc_file"
+    fi
+}
+
 # Update both shell configs if they exist
 inject_source "$HOME/.bashrc"
 inject_source "$HOME/.zshrc"
+inject_path "$HOME/.bashrc"
+inject_path "$HOME/.zshrc"
 
 echo "Done."
 

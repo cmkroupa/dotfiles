@@ -41,8 +41,4 @@ map("n", "<leader>gg", "<cmd>LazyGit<cr>", { desc = "LazyGit" })
 -- search/replace
 map("n", "<leader>sr", "<cmd>Spectre<cr>", { desc = "Search & replace" })
 
--- ai
-map("n", "<leader>ac", "<cmd>CodeCompanionChat<cr>", { desc = "AI chat" })
-map("n", "<leader>ai", "<cmd>CodeCompanion<cr>", { desc = "AI inline" })
-map("v", "<leader>ai", "<cmd>CodeCompanion<cr>", { desc = "AI inline (selection)" })
-map("n", "<leader>at", "<cmd>CodeCompanionChat Toggle<cr>", { desc = "AI chat toggle" })
+-- ai keymaps live in lua/plugins/ai.lua — registered by goloco.setup{}

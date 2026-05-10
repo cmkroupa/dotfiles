@@ -21,6 +21,7 @@ alias vi='nvim'
 alias vim='nvim'
 
 alias cls='clear'
+
 reload() {
   if [ -n "$ZSH_VERSION" ]; then
     source ~/.zshrc

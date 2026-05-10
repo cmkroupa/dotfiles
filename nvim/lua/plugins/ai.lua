@@ -1,34 +1,31 @@
 return {
 	{
-		"olimorris/codecompanion.nvim",
-		dependencies = { "nvim-lua/plenary.nvim", "nvim-treesitter/nvim-treesitter" },
-		config = function()
-			require("codecompanion").setup({
-				adapters = {
-					ollama = function()
-						return require("codecompanion.adapters").extend("ollama", {
-							schema = {
-								model = { default = "qwen2.5-coder:14b" },
-							},
-						})
-					end,
-				},
-				strategies = {
-					chat = { adapter = "ollama" },
-					inline = { adapter = "ollama" },
-					agent = { adapter = "ollama" },
-				},
-			})
-
-			local map = vim.keymap.set
-			map("n", "<leader>ac", "<cmd>CodeCompanionChat<cr>", { desc = "AI chat" })
-			map("n", "<leader>ai", "<cmd>CodeCompanion<cr>", { desc = "AI inline" })
-			map("v", "<leader>ai", "<cmd>CodeCompanion<cr>", { desc = "AI inline (selection)" })
-			map("v", "<leader>ae", "<cmd>CodeCompanion /explain<cr>", { desc = "AI explain" })
-			map("v", "<leader>af", "<cmd>CodeCompanion /fix<cr>", { desc = "AI fix" })
-			map("v", "<leader>ar", "<cmd>CodeCompanion /refactor<cr>", { desc = "AI refactor" })
-			map("n", "<leader>at", "<cmd>CodeCompanionChat Toggle<cr>", { desc = "AI chat toggle" })
-			map("v", "<leader>at", "<cmd>CodeCompanionChat Add<cr>", { desc = "AI add selection to chat" })
-		end,
+		"cmkroupa/goloco",
+		build = "cargo build --release",
+		opts = {
+			chat_model  = "qwen2.5-coder:7b",
+			embed_model = "nomic-embed-text",
+			rag         = "auto",
+			auto_build  = false,
+			sidebar = {
+				width = 60,
+				side  = "right",
+			},
+			keymaps_global = {
+				n_toggle      = "<leader>aa",
+				n_chat        = "<leader>ac",
+				n_index       = "<leader>ai",
+				n_add_buffer  = "<leader>ad",
+				n_model       = "<leader>am",
+				n_rag_cycle   = "<leader>ar",
+				n_stop        = "<leader>as",
+				n_clear_chat  = "<leader>ax",
+				n_clear_pins  = "<leader>ap",
+				x_explain     = "<leader>ae",
+				x_ask         = "<leader>aq",
+				x_inline_edit = "<leader>ai",
+				x_fix         = "<leader>af",
+			},
+		},
 	},
 }
