@@ -6,7 +6,7 @@ return {
 		opts = {
 			ensure_installed = {
 				-- Ruby / Rails
-				"solargraph", "ruby_lsp",
+				"ruby_lsp",
 				-- Web (ERB templates, HTML, CSS)
 				"html", "cssls", "emmet_ls",
 				-- C / C++
@@ -22,7 +22,6 @@ return {
 		dependencies = { "williamboman/mason-lspconfig.nvim" },
 		config = function()
 			-- Ruby / Rails
-			vim.lsp.config("solargraph", {})
 			vim.lsp.config("ruby_lsp", {})
 			-- Web
 			vim.lsp.config("html", {})
@@ -40,7 +39,7 @@ return {
 			vim.lsp.config("lua_ls", {})
 
 			vim.lsp.enable({
-				"solargraph", "ruby_lsp",
+				"ruby_lsp",
 				"html", "cssls", "emmet_ls",
 				"clangd", "cmake",
 				"pyright", "gopls", "rust_analyzer", "lua_ls",
