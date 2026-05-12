@@ -1,25 +1,33 @@
 return {
 	{ "echasnovski/mini.pairs", opts = {} },
-	{ "echasnovski/mini.surround", opts = {} },
-	{ "folke/trouble.nvim", opts = {} },
 	{
-		"christoomey/vim-tmux-navigator",
-		lazy = false,
+		"echasnovski/mini.surround",
+		opts = {
+			mappings = {
+				add            = "gza",
+				delete         = "gzd",
+				replace        = "gzr",
+				find           = "gzf",
+				find_left      = "gzF",
+				highlight      = "gzh",
+				update_n_lines = "gzn",
+			},
+		},
 	},
+	{ "folke/trouble.nvim", opts = {} },
+	{ "christoomey/vim-tmux-navigator", lazy = false },
+	{ "vimpostor/vim-tpipeline", lazy = false },
 	{
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
 		opts = {
 			ensure_installed = { "python", "rust", "c", "cpp", "ruby", "lua", "vim", "vimdoc" },
 			highlight = { enable = true },
-			indent = { enable = true },
-			matchup = { enable = false },
+			indent    = { enable = true },
+			matchup   = { enable = false },
 		},
 		config = function(_, opts)
 			require("nvim-treesitter").setup(opts)
-			-- Neovim 0.12 changed match[capture_id] to return a list of nodes
-			-- instead of a single node. nvim-treesitter's directives haven't
-			-- been updated yet, so we patch the broken one here.
 			vim.treesitter.query.add_directive(
 				"set-lang-from-info-string!",
 				function(match, _, bufnr, pred, metadata)
@@ -35,29 +43,51 @@ return {
 			)
 		end,
 	},
-	-- shows current function/class at top when scrolled past it
 	{
-		"nvim-treesitter/nvim-treesitter-context",
-		opts = { max_lines = 3 },
+		"nvim-treesitter/nvim-treesitter-textobjects",
+		dependencies = { "nvim-treesitter/nvim-treesitter" },
+		config = function()
+			require("nvim-treesitter.configs").setup({
+				textobjects = {
+					select = {
+						enable    = true,
+						lookahead = true,
+						keymaps = {
+							["af"] = { query = "@function.outer", desc = "Around function" },
+							["if"] = { query = "@function.inner", desc = "Inside function" },
+							["ac"] = { query = "@class.outer",    desc = "Around class" },
+							["ic"] = { query = "@class.inner",    desc = "Inside class" },
+							["aa"] = { query = "@parameter.outer", desc = "Around argument" },
+							["ia"] = { query = "@parameter.inner", desc = "Inside argument" },
+						},
+					},
+					move = {
+						enable     = true,
+						set_jumps  = true,
+						goto_next_start = {
+							["]f"] = { query = "@function.outer", desc = "Next function" },
+							["]t"] = { query = "@class.outer",    desc = "Next class" },
+						},
+						goto_previous_start = {
+							["[f"] = { query = "@function.outer", desc = "Prev function" },
+							["[t"] = { query = "@class.outer",    desc = "Prev class" },
+						},
+					},
+				},
+			})
+		end,
 	},
-	-- LSP progress indicator
-	{
-		"j-hui/fidget.nvim",
-		opts = {},
-	},
-	-- visual undo history
+	{ "nvim-treesitter/nvim-treesitter-context", opts = { max_lines = 3 } },
+	{ "j-hui/fidget.nvim", opts = {} },
 	{
 		"mbbill/undotree",
-		keys = {
-			{ "<leader>u", "<cmd>UndotreeToggle<cr>", desc = "Undo tree" },
-		},
+		keys = { { "<leader>u", "<cmd>UndotreeToggle<cr>", desc = "Undo Tree" } },
 	},
-	-- better % jumping for Ruby def/end, if/endif etc
 	{
 		"andymass/vim-matchup",
 		init = function()
 			vim.g.matchup_matchparen_offscreen = { method = "popup" }
-			vim.g.matchup_treesitter_enabled = 0  -- own TS integration hits nil-node bug
+			vim.g.matchup_treesitter_enabled = 0
 		end,
 	},
 }

@@ -1,0 +1,13 @@
+font-family = "JetBrainsMono Nerd Font"
+font-size = 13
+
+theme = catppuccin-mocha
+
+cursor-style = bar
+cursor-style-blink = true
+
+window-padding-x = 10
+window-padding-y = 8
+window-padding-balance = true
+
+macos-option-as-alt = true

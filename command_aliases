@@ -1,0 +1,67 @@
+# ── Navigation ────────────────────────────────────────────────────────────────
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias home='cd ~'
+alias dotfiles='cd ~/dotfiles'
+
+# ── Files ─────────────────────────────────────────────────────────────────────
+alias ls='eza --icons --group-directories-first'
+alias ll='eza -la --icons --group-directories-first --git'
+alias lt='eza --tree --icons --level=2'
+
+# ── Editor ────────────────────────────────────────────────────────────────────
+alias v='nvim'
+alias vi='nvim'
+alias vim='nvim'
+
+# ── Git ───────────────────────────────────────────────────────────────────────
+alias g='git'
+alias gst='git status'
+alias gad='git add'
+alias gcm='git commit -m'
+alias gph='git push'
+alias gfh='git fetch'
+alias gbr='git branch'
+alias gsw='git switch'
+
+gl() {  git log --oneline -${1:-10}; }
+glg() { git log --oneline --graph --decorate -${1:-20}; }
+
+# ── Search ────────────────────────────────────────────────────────────────────
+alias rg='rg --smart-case'
+alias rgf='rg --files | rg'
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
+alias cls='clear'
+alias path='echo $PATH | tr ":" "\n"'
+
+mkcd()   { mkdir -p "$1" && cd "$1"; }
+dload()  { curl -L -C - -J --progress-bar -O "$1"; }
+weather(){ curl "wttr.in/${1:-Toronto}?format=3"; }
+explain(){ curl "cheat.sh/$1"; }
+pword()  { tr -dc 'A-Za-z0-9!@#$%^&*' < /dev/urandom | head -c ${1:-20}; echo; }
+
+extract() {
+  [[ -f "$1" ]] || { echo "'$1' is not a valid file"; return 1; }
+  case "$1" in
+    *.tar.bz2|*.tar.gz|*.tar.xz|*.tbz2|*.tgz|*.tar) tar xf "$1" ;;
+    *.zip) unzip "$1" ;;
+    *.7z)  7z x "$1" ;;
+    *)     echo "'$1' cannot be extracted" ;;
+  esac
+}
+
+reload() {
+  [[ -n "$ZSH_VERSION" ]]  && source ~/.zshrc  && echo "zsh reloaded"  && return
+  [[ -n "$BASH_VERSION" ]] && source ~/.bashrc && echo "bash reloaded" && return
+  echo "unknown shell"
+}
+
+# ── Package manager (cross-platform) ──────────────────────────────────────────
+update() {
+  if   command -v brew   &>/dev/null; then brew update && brew upgrade
+  elif command -v pacman &>/dev/null; then sudo pacman -Syu
+  elif command -v apt    &>/dev/null; then sudo apt update && sudo apt upgrade
+  else echo "no known package manager"; fi
+}

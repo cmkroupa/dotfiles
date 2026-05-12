@@ -3,40 +3,12 @@ return {
 	{ "windwp/nvim-autopairs", event = "InsertEnter", opts = {} },
 	{ "windwp/nvim-ts-autotag", opts = {} },
 	{
-		"smjonas/inc-rename.nvim",
-		opts = {},
-		keys = {
-			{
-				"<leader>rn",
-				function()
-					return ":IncRename " .. vim.fn.expand("<cword>")
-				end,
-				expr = true,
-				desc = "Rename symbol (live preview)",
-			},
-		},
-	},
-	{
 		"folke/flash.nvim",
 		event = "VeryLazy",
 		opts = {},
 		keys = {
-			{
-				"s",
-				function()
-					require("flash").jump()
-				end,
-				mode = { "n", "x", "o" },
-				desc = "Flash jump",
-			},
-			{
-				"S",
-				function()
-					require("flash").treesitter()
-				end,
-				mode = { "n", "x", "o" },
-				desc = "Flash treesitter jump",
-			},
+			{ "s", function() require("flash").jump() end,       mode = { "n", "x", "o" }, desc = "Flash Jump" },
+			{ "S", function() require("flash").treesitter() end, mode = { "n", "x", "o" }, desc = "TS Jump" },
 		},
 	},
 	{
@@ -44,25 +16,26 @@ return {
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 		lazy = false,
 		keys = {
-			{
-				"<leader>o",
-				function()
-					require("oil").open_float()
-				end,
-				desc = "File manager (Oil)",
-			},
+			{ "<leader>o", function() require("oil").open_float() end, desc = "Files" },
 		},
 		opts = {},
 	},
 	{
-		"akinsho/toggleterm.nvim",
-		version = "*",
-		keys = {
-			{ "<C-\\>", "<cmd>ToggleTerm<cr>", desc = "Toggle floating terminal" },
-		},
+		"abecodes/tabout.nvim",
+		event = "InsertEnter",
 		opts = {
-			direction = "float",
-			float_opts = { border = "curved" },
+			tabkey          = "<Tab>",
+			backwards_tabkey = "<S-Tab>",
+			act_as_tab      = true,
+			completion      = true,
 		},
+	},
+	{
+		"Wansmer/treesj",
+		dependencies = { "nvim-treesitter/nvim-treesitter" },
+		keys = {
+			{ "<leader>j", function() require("treesj").toggle() end, desc = "Join/Split" },
+		},
+		opts = { use_default_keymaps = false },
 	},
 }

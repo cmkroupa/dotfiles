@@ -27,11 +27,6 @@ return {
 			})
 		end,
 	},
-	-- buffer tabs
-	{
-		"akinsho/bufferline.nvim",
-		opts = { options = { separator_style = "slant" } },
-	},
 	-- fancy cmdline + notifications
 	{
 		"folke/noice.nvim",
@@ -40,29 +35,24 @@ return {
 	},
 	-- indent guides
 	{ "lukas-reineke/indent-blankline.nvim", main = "ibl", opts = {} },
-	-- git signs
+	-- git signs in gutter
 	{ "lewis6991/gitsigns.nvim", opts = {} },
-	-- todo highlights
+	-- todo/fixme highlights
 	{ "folke/todo-comments.nvim", opts = {} },
-	-- file tree
-	{
-		"nvim-neo-tree/neo-tree.nvim",
-		dependencies = { "nvim-lua/plenary.nvim", "nvim-tree/nvim-web-devicons", "MunifTanjim/nui.nvim" },
-		opts = {},
-	},
 	-- which-key
 	{
 		"folke/which-key.nvim",
 		opts = {
 			spec = {
-				{ "<leader>a", group = "AI" },
 				{ "<leader>f", group = "Find" },
-				{ "<leader>b", group = "Buffers" },
-				{ "<leader>s", group = "Splits/Search" },
-				{ "<leader>x", group = "Diagnostics" },
-				{ "<leader>g", group = "Git" },
-				{ "<leader>l", group = "Lazy" },
-				{ "<leader>t", group = "Terminal" },
+				{ "<leader>h", group = "Harpoon" },
+				{ "<leader>c", group = "Code" },
+				{ "g",         group = "LSP" },
+				{ "gz",        group = "Surround" },
+				{ "[",         group = "Prev" },
+				{ "]",         group = "Next" },
+				{ "a",         group = "Around",  mode = { "o", "x" } },
+				{ "i",         group = "Inside",  mode = { "o", "x" } },
 			},
 		},
 	},

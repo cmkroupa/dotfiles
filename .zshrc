@@ -1,0 +1,64 @@
+# ── History ───────────────────────────────────────────────────────────────────
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt HIST_IGNORE_ALL_DUPS SHARE_HISTORY
+
+autoload -U up-line-or-beginning-search down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey "^[[A" up-line-or-beginning-search
+bindkey "^[[B" down-line-or-beginning-search
+
+# ── Paths ─────────────────────────────────────────────────────────────────────
+[[ -d /opt/homebrew/bin ]]      && eval "$(/opt/homebrew/bin/brew shellenv)"  # macOS Apple Silicon
+[[ -d /usr/local/bin/brew ]]    && eval "$(/usr/local/bin/brew shellenv)"     # macOS Intel
+[[ -d /opt/homebrew/opt/llvm ]] && export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
+[[ -d "$HOME/.local/bin" ]]     && export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/dotfiles/bin:$PATH"
+
+# ── Completions ───────────────────────────────────────────────────────────────
+autoload -Uz compinit && compinit
+
+# ── CDPATH ────────────────────────────────────────────────────────────────────
+cdpath=($HOME $HOME/Projects)
+
+# ── Aliases & functions ───────────────────────────────────────────────────────
+source ~/dotfiles/command_aliases
+[[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
+
+# ── Plugins (path varies by OS / package manager) ─────────────────────────────
+_source_plugin() {
+  local name="$1" file="$1.zsh"
+  local -a candidates=(
+    "/opt/homebrew/share/$name/$file"          # macOS homebrew
+    "/usr/share/$name/$file"                    # Ubuntu apt
+    "/usr/share/zsh/plugins/$name/$file"        # Arch pacman
+    "/usr/share/zsh-$name/$file"               # some Debian variants
+  )
+  for p in "${candidates[@]}"; do [[ -f "$p" ]] && source "$p" && return; done
+}
+_source_plugin zsh-syntax-highlighting
+_source_plugin zsh-autosuggestions
+
+# ── Conda (only if installed) ─────────────────────────────────────────────────
+if command -v conda &>/dev/null || [[ -f /opt/anaconda3/bin/conda ]]; then
+  __conda_setup="$('/opt/anaconda3/bin/conda' 'shell.zsh' 'hook' 2>/dev/null)"
+  if [[ $? -eq 0 ]]; then
+    eval "$__conda_setup"
+  else
+    [[ -f /opt/anaconda3/etc/profile.d/conda.sh ]] \
+      && source /opt/anaconda3/etc/profile.d/conda.sh \
+      || export PATH="/opt/anaconda3/bin:$PATH"
+  fi
+  unset __conda_setup
+fi
+
+# ── Mise ──────────────────────────────────────────────────────────────────────
+command -v mise &>/dev/null && eval "$(mise activate zsh)"
+
+# ── Zoxide (smart cd) ─────────────────────────────────────────────────────────
+command -v zoxide &>/dev/null && eval "$(zoxide init zsh --cmd cd)"
+
+# ── Prompt ────────────────────────────────────────────────────────────────────
+command -v starship &>/dev/null && eval "$(starship init zsh)"
