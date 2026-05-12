@@ -65,8 +65,8 @@ return {
 			telescope.load_extension("live_grep_args")
 		end,
 		keys = {
-			{ "<leader>ff", "<cmd>Telescope find_files cwd=~<cr>", desc = "Find files" },
-			{ "<leader>fg", "<cmd>Telescope live_grep_args cwd=~<cr>", desc = "Live grep (with args)" },
+			{ "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find files" },
+			{ "<leader>fg", "<cmd>Telescope live_grep_args<cr>", desc = "Live grep (with args)" },
 			{ "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
 			{ "<leader>fs", "<cmd>Telescope lsp_document_symbols<cr>", desc = "LSP symbols" },
 			{ "<leader>fd", "<cmd>Telescope diagnostics<cr>", desc = "Diagnostics" },
