@@ -20,11 +20,38 @@ return {
 	{
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
+		dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
 		opts = {
 			ensure_installed = { "python", "rust", "c", "cpp", "ruby", "lua", "vim", "vimdoc" },
 			highlight = { enable = true },
 			indent    = { enable = true },
 			matchup   = { enable = false },
+			textobjects = {
+				select = {
+					enable    = true,
+					lookahead = true,
+					keymaps = {
+						["af"] = { query = "@function.outer",  desc = "Around function" },
+						["if"] = { query = "@function.inner",  desc = "Inside function" },
+						["ac"] = { query = "@class.outer",     desc = "Around class" },
+						["ic"] = { query = "@class.inner",     desc = "Inside class" },
+						["aa"] = { query = "@parameter.outer", desc = "Around argument" },
+						["ia"] = { query = "@parameter.inner", desc = "Inside argument" },
+					},
+				},
+				move = {
+					enable    = true,
+					set_jumps = true,
+					goto_next_start = {
+						["]f"] = { query = "@function.outer", desc = "Next function" },
+						["]t"] = { query = "@class.outer",    desc = "Next class" },
+					},
+					goto_previous_start = {
+						["[f"] = { query = "@function.outer", desc = "Prev function" },
+						["[t"] = { query = "@class.outer",    desc = "Prev class" },
+					},
+				},
+			},
 		},
 		config = function(_, opts)
 			require("nvim-treesitter").setup(opts)
@@ -41,40 +68,6 @@ return {
 				end,
 				{ force = true }
 			)
-		end,
-	},
-	{
-		"nvim-treesitter/nvim-treesitter-textobjects",
-		dependencies = { "nvim-treesitter/nvim-treesitter" },
-		config = function()
-			require("nvim-treesitter.configs").setup({
-				textobjects = {
-					select = {
-						enable    = true,
-						lookahead = true,
-						keymaps = {
-							["af"] = { query = "@function.outer", desc = "Around function" },
-							["if"] = { query = "@function.inner", desc = "Inside function" },
-							["ac"] = { query = "@class.outer",    desc = "Around class" },
-							["ic"] = { query = "@class.inner",    desc = "Inside class" },
-							["aa"] = { query = "@parameter.outer", desc = "Around argument" },
-							["ia"] = { query = "@parameter.inner", desc = "Inside argument" },
-						},
-					},
-					move = {
-						enable     = true,
-						set_jumps  = true,
-						goto_next_start = {
-							["]f"] = { query = "@function.outer", desc = "Next function" },
-							["]t"] = { query = "@class.outer",    desc = "Next class" },
-						},
-						goto_previous_start = {
-							["[f"] = { query = "@function.outer", desc = "Prev function" },
-							["[t"] = { query = "@class.outer",    desc = "Prev class" },
-						},
-					},
-				},
-			})
 		end,
 	},
 	{ "nvim-treesitter/nvim-treesitter-context", opts = { max_lines = 3 } },
