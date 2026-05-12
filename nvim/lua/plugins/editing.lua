@@ -31,6 +31,12 @@ return {
 		},
 	},
 	{
+		"ThePrimeagen/vim-be-good",
+		keys = {
+			{ "<leader>vg", "<cmd>VimBeGood<cr>", desc = "Vim Be Good" },
+		},
+	},
+	{
 		"Wansmer/treesj",
 		dependencies = { "nvim-treesitter/nvim-treesitter" },
 		keys = {
