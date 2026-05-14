@@ -1,0 +1,16 @@
+#!/bin/bash
+printf '  tmux keybindings\n'
+printf '  ─────────────────────────\n'
+printf '  Alt-h / Alt-l   prev/next window\n'
+printf '  Alt-y           new window\n'
+printf '  Alt-u           zoom pane\n'
+printf '  Alt-i           rename window\n'
+printf '  Alt-o           kill window\n'
+printf '  Alt-p           kill pane\n'
+printf '  ─────────────────────────\n'
+printf '  C-Space |       split right\n'
+printf '  C-Space -       split down\n'
+printf '  C-Space r       reload config\n'
+printf '  ─────────────────────────\n'
+printf '  press any key to close\n'
+read -n1

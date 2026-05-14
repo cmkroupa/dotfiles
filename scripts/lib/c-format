@@ -1,0 +1,151 @@
+#!/usr/bin/env python3
+"""clang-format wrapper: splits storage-class specifiers and forces function
+definition parameters onto their own lines."""
+import re
+import subprocess
+import sys
+
+STYLE = (
+    "{"
+    "BasedOnStyle: LLVM, "
+    "IndentWidth: 4, "
+    "UseTab: Never, "
+    "ColumnLimit: 100, "
+    "BreakBeforeBraces: Allman, "
+    "SpaceBeforeParens: ControlStatements, "
+    "AllowShortFunctionsOnASingleLine: None, "
+    "AlwaysBreakAfterReturnType: All, "
+    "AlignAfterOpenBracket: AlwaysBreak, "
+    "BinPackParameters: false"
+    "}"
+)
+
+SC_RE = re.compile(r"^(\s*)(static|inline|extern)\s+(.+)$")
+FN_RE = re.compile(r"^\s*[A-Za-z_]\w*\s*\(")
+
+
+def split_storage_classes(lines):
+    """Put storage-class specifiers on their own line before the return type."""
+    out = []
+    for i, line in enumerate(lines):
+        m = SC_RE.match(line)
+        if m and i + 1 < len(lines) and FN_RE.match(lines[i + 1]):
+            out.append(m.group(1) + m.group(2))
+            out.append(m.group(1) + m.group(3))
+        else:
+            out.append(line)
+    return out
+
+
+def parse_params(params_str):
+    """Split comma-separated params respecting nested parens."""
+    params, depth, current = [], 0, []
+    for ch in params_str:
+        if ch == "(":
+            depth += 1
+            current.append(ch)
+        elif ch == ")":
+            depth -= 1
+            current.append(ch)
+        elif ch == "," and depth == 0:
+            params.append("".join(current).strip())
+            current = []
+        else:
+            current.append(ch)
+    if current:
+        params.append("".join(current).strip())
+    return params
+
+
+def next_nonempty(lines, start):
+    """Return index of the next non-empty line at or after start, or -1."""
+    i = start
+    while i < len(lines):
+        if lines[i].strip():
+            return i
+        i += 1
+    return -1
+
+
+def emit_params(out, func_open, params_str):
+    """Append func_open line then each param on its own indented line."""
+    params = parse_params(params_str)
+    out.append(func_open)
+    for k, param in enumerate(params):
+        suffix = "," if k < len(params) - 1 else ")"
+        out.append("    " + param + suffix)
+
+
+def split_function_params(lines):
+    """For top-level function definitions, force each parameter onto its own line.
+
+    Handles two shapes produced by clang-format:
+      Case A:  funcname(p1, p2)   <- all on one line, ends with )
+               {
+      Case B:  funcname(          <- already broke after (, ends with (
+                   p1, p2)        <- params bin-packed on next line
+               {
+    """
+    out = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        is_toplevel = line and line[0] not in (" ", "\t")
+        is_comment = line.lstrip().startswith(("/", "*", "#"))
+
+        if is_toplevel and not is_comment and "(" in line:
+            # Case A: funcname(params) all on one line
+            if line.rstrip().endswith(")"):
+                j = next_nonempty(lines, i + 1)
+                if j != -1 and lines[j].strip() == "{":
+                    popen = line.index("(")
+                    pclose = line.rindex(")")
+                    func_part = line[: popen + 1]
+                    params_str = line[popen + 1 : pclose]
+                    if params_str.strip() and params_str.strip() != "void":
+                        emit_params(out, func_part, params_str)
+                        i += 1
+                        continue
+
+            # Case B: funcname( on its own line, then indented "p1, p2)" next
+            if line.rstrip().endswith("("):
+                j = next_nonempty(lines, i + 1)
+                if (
+                    j != -1
+                    and lines[j][:1] in (" ", "\t")
+                    and lines[j].rstrip().endswith(")")
+                ):
+                    k = next_nonempty(lines, j + 1)
+                    if k != -1 and lines[k].strip() == "{":
+                        params_line = lines[j].rstrip()
+                        params_str = params_line.rstrip(")").strip()
+                        if params_str and params_str != "void":
+                            params = parse_params(params_str)
+                            if len(params) > 1:
+                                emit_params(out, line, params_str)
+                                i = j + 1  # skip the consumed params line
+                                continue
+
+        out.append(line)
+        i += 1
+    return out
+
+
+def process(text):
+    lines = text.split("\n")
+    lines = split_storage_classes(lines)
+    lines = split_function_params(lines)
+    return "\n".join(lines)
+
+
+proc = subprocess.run(
+    ["clang-format", "--style=" + STYLE] + sys.argv[1:],
+    stdin=sys.stdin,
+    capture_output=True,
+    text=True,
+)
+if proc.returncode != 0:
+    sys.stderr.write(proc.stderr)
+    sys.exit(proc.returncode)
+
+sys.stdout.write(process(proc.stdout))

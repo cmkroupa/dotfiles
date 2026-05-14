@@ -1,5 +1,5 @@
 format = """
-$directory$git_branch$git_status$character"""
+$directory${custom.git_dirty}${custom.git_ahead}${custom.git_clean}$git_status$character"""
 
 add_newline = false
 
@@ -9,13 +9,33 @@ truncation_length = 4
 truncate_to_repo = true
 
 [git_branch]
-symbol = " "
-style = "bold purple"
-format = "[$symbol$branch]($style) "
+disabled = true
+
+# ── Coloured branch (one shows at a time) ─────────────────────────────────────
+[custom.git_dirty]
+description = "Branch red when uncommitted changes exist"
+command = "git branch --show-current"
+when = 'git status --porcelain 2>/dev/null | grep -q .'
+style = "bold red"
+format = "[ $output]($style) "
+
+[custom.git_ahead]
+description = "Branch yellow when clean but unpushed commits exist"
+command = "git branch --show-current"
+when = 'test -z "$(git status --porcelain 2>/dev/null)" && git rev-list "@{upstream}..HEAD" 2>/dev/null | grep -q .'
+style = "bold yellow"
+format = "[ $output]($style) "
+
+[custom.git_clean]
+description = "Branch green when fully up to date"
+command = "git branch --show-current"
+when = 'test -z "$(git status --porcelain 2>/dev/null)" && ! git rev-list "@{upstream}..HEAD" 2>/dev/null | grep -q .'
+style = "bold green"
+format = "[ $output]($style) "
 
 [git_status]
 style = "bold red"
-format = "([$all_status$ahead_behind]($style) )"
+format = "([$all_status]($style) )"
 conflicted = "󰦚 "
 ahead = "⇡${count} "
 behind = "⇣${count} "

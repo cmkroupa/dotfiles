@@ -65,3 +65,6 @@ update() {
   elif command -v apt    &>/dev/null; then sudo apt update && sudo apt upgrade
   else echo "no known package manager"; fi
 }
+
+[[ -n "$BASH_VERSION" ]] && bind '"\e[A": history-search-backward'
+[[ -n "$BASH_VERSION" ]] && bind '"\e[B": history-search-forward'
