@@ -1,5 +1,4 @@
 return {
-	{ "echasnovski/mini.pairs", opts = {} },
 	{
 		"echasnovski/mini.surround",
 		opts = {
@@ -16,13 +15,17 @@ return {
 	},
 	{ "folke/trouble.nvim", opts = {} },
 	{ "christoomey/vim-tmux-navigator", lazy = false },
-	{ "vimpostor/vim-tpipeline", lazy = false },
 	{
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
 		dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
 		opts = {
-			ensure_installed = { "python", "rust", "c", "cpp", "ruby", "lua", "vim", "vimdoc" },
+			ensure_installed = {
+				"python", "rust", "c", "cpp", "ruby", "lua", "vim", "vimdoc",
+				"go", "html", "css", "javascript", "typescript", "json", "yaml",
+				"bash", "toml", "markdown", "markdown_inline",
+			},
+			auto_install = true,
 			highlight = { enable = true },
 			indent    = { enable = true },
 			matchup   = { enable = false },
@@ -71,6 +74,14 @@ return {
 		end,
 	},
 	{ "nvim-treesitter/nvim-treesitter-context", opts = { max_lines = 3 } },
+	{
+		"RRethy/vim-illuminate",
+		event = { "BufReadPost", "BufNewFile" },
+		opts = { delay = 100, large_file_cutoff = 2000 },
+		config = function(_, opts)
+			require("illuminate").configure(opts)
+		end,
+	},
 	{ "j-hui/fidget.nvim", opts = {} },
 	{
 		"mbbill/undotree",
@@ -79,7 +90,7 @@ return {
 	{
 		"andymass/vim-matchup",
 		init = function()
-			vim.g.matchup_matchparen_offscreen = { method = "popup" }
+			vim.g.matchup_matchparen_offscreen = { method = "status" }
 			vim.g.matchup_treesitter_enabled = 0
 		end,
 	},

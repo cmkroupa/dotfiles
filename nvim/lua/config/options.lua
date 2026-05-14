@@ -12,5 +12,40 @@ vim.opt.scrolloff = 8
 vim.opt.splitbelow = true
 vim.opt.splitright = true
 vim.opt.clipboard = "unnamedplus"
+vim.opt.swapfile = false
 vim.opt.undofile = true
 vim.opt.updatetime = 100
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+vim.opt.colorcolumn = "120"
+
+vim.api.nvim_create_autocmd("BufWritePre", {
+    pattern = "*",
+    callback = function()
+        local pos = vim.api.nvim_win_get_cursor(0)
+        vim.cmd([[%s/\s\+$//e]])
+        vim.api.nvim_win_set_cursor(0, pos)
+    end,
+})
+
+
+if vim.fn.has("wsl") == 1 then
+    if vim.fn.executable("win32yank.exe") == 1 then
+        vim.g.clipboard = {
+            name = "win32yank",
+            copy  = { ["+"] = "win32yank.exe -i --crlf", ["*"] = "win32yank.exe -i --crlf" },
+            paste = { ["+"] = "win32yank.exe -o --lf",   ["*"] = "win32yank.exe -o --lf" },
+            cache_enabled = 0,
+        }
+    else
+        vim.g.clipboard = {
+            name = "WslClipboard",
+            copy  = { ["+"] = "clip.exe", ["*"] = "clip.exe" },
+            paste = {
+                ["+"] = 'powershell.exe -NoProfile -NonInteractive -c [Console]::Out.Write((Get-Clipboard -Raw).Replace("`r`n","`n").Replace("`r","`n"))',
+                ["*"] = 'powershell.exe -NoProfile -NonInteractive -c [Console]::Out.Write((Get-Clipboard -Raw).Replace("`r`n","`n").Replace("`r","`n"))',
+            },
+            cache_enabled = 0,
+        }
+    end
+end

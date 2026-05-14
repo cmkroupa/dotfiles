@@ -35,9 +35,10 @@ return {
 			telescope.load_extension("live_grep_args")
 		end,
 		keys = {
-			{ "<leader>ff", "<cmd>Telescope find_files<cr>",                desc = "Find Files" },
-			{ "<leader>fw", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Find Word" },
-			{ "<leader>fg", "<cmd>Telescope live_grep_args<cr>",            desc = "Grep" },
+			{ "<leader>sf", "<cmd>Telescope find_files<cr>",                desc = "Files" },
+			{ "<leader>sw", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Word" },
+			{ "<leader>sg", "<cmd>Telescope live_grep_args<cr>",            desc = "Grep" },
+			{ "<leader>sb", "<cmd>Telescope buffers<cr>",                   desc = "Buffers" },
 		},
 	},
 }
