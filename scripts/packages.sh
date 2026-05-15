@@ -12,7 +12,8 @@ case "$OS" in
       eval "$(/opt/homebrew/bin/brew shellenv)"
     fi
     brew install neovim git lazygit tmux fzf ripgrep eza zoxide mise \
-                 zsh-syntax-highlighting zsh-autosuggestions starship uncrustify
+                 zsh-syntax-highlighting zsh-autosuggestions starship uncrustify \
+                 btop bat fd dust gum jq fastfetch gh lazydocker
     brew install --cask ghostty font-jetbrains-mono-nerd-font
     ;;
 
@@ -22,14 +23,72 @@ case "$OS" in
       neovim git lazygit tmux fzf ripgrep eza zoxide mise \
       zsh-syntax-highlighting zsh-autosuggestions starship \
       ttf-jetbrains-mono-nerd ghostty \
-      base-devel clang uncrustify
+      base-devel clang uncrustify \
+      btop bat fd dust gum jq tealdeer fastfetch github-cli
+    if command -v yay &>/dev/null; then
+      yay -S --noconfirm lazydocker
+    fi
     ;;
 
   ubuntu)
     sudo apt update
     sudo apt install -y git tmux fzf ripgrep curl unzip wget zoxide \
       build-essential clang uncrustify \
-      libyaml-dev libssl-dev libreadline-dev libffi-dev zlib1g-dev libgdbm-dev
+      libyaml-dev libssl-dev libreadline-dev libffi-dev zlib1g-dev libgdbm-dev \
+      btop bat fd-find jq
+
+    # Ubuntu names bat→batcat and fd→fdfind; expose them under the normal names
+    mkdir -p "$HOME/.local/bin"
+    [[ -f /usr/bin/batcat ]] && ln -sf /usr/bin/batcat "$HOME/.local/bin/bat"
+    [[ -f /usr/bin/fdfind ]] && ln -sf /usr/bin/fdfind "$HOME/.local/bin/fd"
+
+    # gum (Charm apt repo)
+    if ! command -v gum &>/dev/null; then
+      sudo mkdir -p /etc/apt/keyrings
+      curl -fsSL https://repo.charm.sh/apt/gpg.key \
+        | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
+      echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" \
+        | sudo tee /etc/apt/sources.list.d/charm.list
+      sudo apt update && sudo apt install -y gum
+    fi
+
+    # gh (GitHub CLI apt repo)
+    if ! command -v gh &>/dev/null; then
+      curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+        | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+      echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+        | sudo tee /etc/apt/sources.list.d/github-cli.list
+      sudo apt update && sudo apt install -y gh
+    fi
+
+    # dust (binary from GitHub)
+    if ! command -v dust &>/dev/null; then
+      DUST=$(curl -s "https://api.github.com/repos/bootandy/dust/releases/latest" \
+        | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+      curl -sLo /tmp/dust.tar.gz \
+        "https://github.com/bootandy/dust/releases/download/v${DUST}/dust-v${DUST}-x86_64-unknown-linux-gnu.tar.gz"
+      tar xf /tmp/dust.tar.gz -C /tmp
+      sudo install "/tmp/dust-v${DUST}-x86_64-unknown-linux-gnu/dust" /usr/local/bin/
+    fi
+
+    # fastfetch (deb from GitHub)
+    if ! command -v fastfetch &>/dev/null; then
+      FF=$(curl -s "https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest" \
+        | grep '"tag_name"' | sed 's/.*"\([^"]*\)".*/\1/')
+      curl -sLo /tmp/fastfetch.deb \
+        "https://github.com/fastfetch-cli/fastfetch/releases/download/${FF}/fastfetch-linux-amd64.deb"
+      sudo dpkg -i /tmp/fastfetch.deb
+    fi
+
+    # lazydocker (binary from GitHub)
+    if ! command -v lazydocker &>/dev/null; then
+      LD=$(curl -s "https://api.github.com/repos/jesseduffield/lazydocker/releases/latest" \
+        | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+      curl -sLo /tmp/lazydocker.tar.gz \
+        "https://github.com/jesseduffield/lazydocker/releases/download/v${LD}/lazydocker_${LD}_Linux_x86_64.tar.gz"
+      tar xf /tmp/lazydocker.tar.gz -C /tmp lazydocker
+      sudo install /tmp/lazydocker /usr/local/bin/
+    fi
 
     curl https://mise.run | sh
 

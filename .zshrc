@@ -20,9 +20,6 @@ export PATH="$HOME/dotfiles/bin:$PATH"
 # ── Completions ───────────────────────────────────────────────────────────────
 autoload -Uz compinit && compinit
 
-# ── CDPATH ────────────────────────────────────────────────────────────────────
-cdpath=($HOME $HOME/Projects)
-
 # ── Aliases & functions ───────────────────────────────────────────────────────
 source ~/dotfiles/command_aliases
 [[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh

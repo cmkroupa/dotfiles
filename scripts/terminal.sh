@@ -25,7 +25,7 @@ else
   CONF_FILE="$HOME/.bashrc"
   INIT_CMDS=(
     "eval \"\$($HOME/.local/bin/mise activate bash)\""
-    "eval \"\$(zoxide init bash)\""
+    "eval \"\$(zoxide init bash --cmd cd)\""
     "eval \"\$(starship init bash)\""
     "source $DOTFILES/command_aliases"
   )
