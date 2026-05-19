@@ -10,7 +10,7 @@ if [[ -d "$NVIM_DIR" && ! -L "$NVIM_DIR" ]]; then
   echo "  Backing up existing nvim config to $NVIM_DIR.bak..."
   mv "$NVIM_DIR" "$NVIM_DIR.bak"
 fi
-ln -sf "$DOTFILES/nvim" "$NVIM_DIR"
+ln -sfn "$DOTFILES/nvim" "$NVIM_DIR"
 
 echo "==> Linking formatter configs..."
 ln -sf "$DOTFILES/uncrustify.cfg" "$HOME/.uncrustify.cfg"
