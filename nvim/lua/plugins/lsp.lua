@@ -22,8 +22,6 @@ return {
         dependencies = { "williamboman/mason.nvim" },
         opts = {
             ensure_installed = {
-                -- Ruby / Rails
-                "ruby_lsp",
                 -- Web (ERB templates, HTML, CSS)
                 "html",
                 "cssls",
@@ -36,7 +34,7 @@ return {
                 "rust_analyzer",
                 "lua_ls",
             },
-            automatic_installation = true,
+            automatic_installation = { exclude = { "solargraph" } },
         },
     },
     {

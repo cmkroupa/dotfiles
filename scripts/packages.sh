@@ -19,8 +19,9 @@ case "$OS" in
 
   arch)
     sudo pacman -Syu --noconfirm
+    sudo pacman -Rns --noconfirm tldr 2>/dev/null || true
     sudo pacman -S --noconfirm --needed \
-      neovim git lazygit tmux fzf ripgrep eza zoxide mise \
+      zsh neovim git lazygit tmux fzf ripgrep eza zoxide mise \
       zsh-syntax-highlighting zsh-autosuggestions starship \
       ttf-jetbrains-mono-nerd ghostty \
       base-devel clang uncrustify \
@@ -32,7 +33,8 @@ case "$OS" in
 
   ubuntu)
     sudo apt update
-    sudo apt install -y git tmux fzf ripgrep curl unzip wget zoxide \
+    sudo apt install -y git zsh tmux fzf ripgrep curl unzip wget zoxide \
+      zsh-syntax-highlighting zsh-autosuggestions \
       build-essential clang uncrustify \
       libyaml-dev libssl-dev libreadline-dev libffi-dev zlib1g-dev libgdbm-dev \
       btop bat fd-find jq

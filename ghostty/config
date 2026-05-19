@@ -1,13 +1,36 @@
+# ── Font ──────────────────────────────────────────────────────────────────────
 font-family = "JetBrainsMono Nerd Font"
-font-size = 13
+font-style  = Regular
+font-size   = 13
 
+# ── Theme ─────────────────────────────────────────────────────────────────────
 theme = catppuccin-mocha
 
-cursor-style = bar
-cursor-style-blink = true
-
-window-padding-x = 10
-window-padding-y = 8
+# ── Window ────────────────────────────────────────────────────────────────────
+window-theme           = ghostty
+window-padding-x       = 10
+window-padding-y       = 8
 window-padding-balance = true
+confirm-close-surface  = false
+resize-overlay         = never
 
-macos-option-as-alt = true
+# ── Cursor ────────────────────────────────────────────────────────────────────
+cursor-style       = block
+cursor-style-blink = false
+
+# ── Shell integration ─────────────────────────────────────────────────────────
+shell-integration-features = no-cursor,ssh-env
+
+# ── Keyboard bindings ─────────────────────────────────────────────────────────
+keybind = shift+insert=paste_from_clipboard
+keybind = control+insert=copy_to_clipboard
+keybind = super+control+shift+alt+arrow_down=resize_split:down,100
+keybind = super+control+shift+alt+arrow_up=resize_split:up,100
+keybind = super+control+shift+alt+arrow_left=resize_split:left,100
+keybind = super+control+shift+alt+arrow_right=resize_split:right,100
+
+# ── Scrolling ─────────────────────────────────────────────────────────────────
+mouse-scroll-multiplier = 0.95
+
+# ── Platform-specific overrides (written by setup.sh --terminal) ───────────────
+config-file = ?~/.config/ghostty/platform.conf

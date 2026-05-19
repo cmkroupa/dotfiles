@@ -12,10 +12,10 @@ bindkey "^[[B" down-line-or-beginning-search
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 [[ -d /opt/homebrew/bin ]]      && eval "$(/opt/homebrew/bin/brew shellenv)"  # macOS Apple Silicon
-[[ -d /usr/local/bin/brew ]]    && eval "$(/usr/local/bin/brew shellenv)"     # macOS Intel
+[[ -x /usr/local/bin/brew ]]    && eval "$(/usr/local/bin/brew shellenv)"     # macOS Intel
 [[ -d /opt/homebrew/opt/llvm ]] && export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
 [[ -d "$HOME/.local/bin" ]]     && export PATH="$HOME/.local/bin:$PATH"
-export PATH="$HOME/dotfiles/bin:$PATH"
+[[ -d "$HOME/dotfiles/bin" ]] && export PATH="$HOME/dotfiles/bin:$PATH"
 
 # ── Completions ───────────────────────────────────────────────────────────────
 autoload -Uz compinit && compinit

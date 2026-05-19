@@ -14,11 +14,15 @@ return {
                 stylua = {
                     prepend_args = { "--indent-type", "Spaces", "--indent-width", "4" },
                 },
+                rubocop = {
+                    args = { "--autocorrect-all", "--format", "quiet", "--stderr", "--stdin", "$FILENAME" },
+                    exit_codes = { 0, 1 },
+                },
             },
             format_on_save = function(bufnr)
                 local ft = vim.bo[bufnr].filetype
                 if ft == "c" or ft == "cpp" then return nil end
-                return { timeout_ms = 2000, lsp_fallback = true }
+                return { timeout_ms = 5000, lsp_fallback = true }
             end,
         },
     },

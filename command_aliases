@@ -55,9 +55,10 @@ extract() {
 }
 
 reload() {
-  [[ -n "$ZSH_VERSION" ]]  && source ~/.zshrc  && echo "zsh reloaded"  && return
-  [[ -n "$BASH_VERSION" ]] && source ~/.bashrc && echo "bash reloaded" && return
-  echo "unknown shell"
+  if   [[ -n "$ZSH_VERSION"  ]]; then source ~/.zshrc  && echo "zsh reloaded"
+  elif [[ -n "$BASH_VERSION" ]]; then source ~/.bashrc && echo "bash reloaded"
+  else echo "unknown shell"
+  fi
 }
 
 # ── Package manager (cross-platform) ──────────────────────────────────────────
