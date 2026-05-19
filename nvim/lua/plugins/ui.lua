@@ -124,6 +124,7 @@ return {
 				height = { min = 3, max = 8 },
 			},
 			spec = {
+				{ "<leader>b", group = "Buffers" },
 				{ "<leader>s", group = "Search" },
 				{ "<leader>f", group = "Format" },
 				{ "<leader>p", group = "Pins" },
