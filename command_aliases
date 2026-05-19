@@ -12,6 +12,23 @@ alias lt='eza --tree --icons --level=2'
 alias cat='bat --paging=never'
 alias find='fd'
 
+head() {
+    local n=10
+    if [[ $1 == -n ]]; then n=$2; shift 2
+    elif [[ $1 =~ ^-[0-9]+$ ]]; then n=${1#-}; shift
+    fi
+    bat --paging=never -r ":$n" "$@"
+}
+
+tail() {
+    for arg in "$@"; do [[ $arg == -f ]] && { command tail "$@"; return; }; done
+    local n=10
+    if [[ $1 == -n ]]; then n=$2; shift 2
+    elif [[ $1 =~ ^-[0-9]+$ ]]; then n=${1#-}; shift
+    fi
+    command tail -n "$n" "$@" | bat --paging=never --file-name="${@: -1}"
+}
+
 # ── Editor ────────────────────────────────────────────────────────────────────
 alias v='nvim'
 alias vi='nvim'
@@ -19,6 +36,7 @@ alias vim='nvim'
 
 # ── Git ───────────────────────────────────────────────────────────────────────
 alias g='git'
+alias vgit='lazygit'
 alias gst='git status'
 alias gad='git add'
 alias gcm='git commit -m'
@@ -35,6 +53,7 @@ alias rg='rg --smart-case'
 alias rgf='rg --files | rg'
 
 # ── Utilities ─────────────────────────────────────────────────────────────────
+alias aliases='bash ~/dotfiles/scripts/alias-help.sh'
 alias cls='clear'
 alias path='echo $PATH | tr ":" "\n"'
 
@@ -55,10 +74,9 @@ extract() {
 }
 
 reload() {
-  if   [[ -n "$ZSH_VERSION"  ]]; then source ~/.zshrc  && echo "zsh reloaded"
-  elif [[ -n "$BASH_VERSION" ]]; then source ~/.bashrc && echo "bash reloaded"
-  else echo "unknown shell"
-  fi
+  [[ -n "$ZSH_VERSION" ]]  && source ~/.zshrc  && echo "zsh reloaded"  && return
+  [[ -n "$BASH_VERSION" ]] && source ~/.bashrc && echo "bash reloaded" && return
+  echo "unknown shell"
 }
 
 # ── Package manager (cross-platform) ──────────────────────────────────────────
