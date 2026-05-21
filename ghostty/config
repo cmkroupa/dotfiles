@@ -4,7 +4,7 @@ font-style  = Regular
 font-size   = 13
 
 # ── Theme ─────────────────────────────────────────────────────────────────────
-theme = catppuccin-mocha
+theme = Catppuccin Mocha
 
 # ── Window ────────────────────────────────────────────────────────────────────
 window-theme           = ghostty

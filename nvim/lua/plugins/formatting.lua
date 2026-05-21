@@ -4,24 +4,24 @@ return {
         opts = {
             formatters_by_ft = {
                 python = { "black" },
-                rust = { "rustfmt" },
-                ruby = { "rubocop" },
-                eruby = { "rubocop" },
-                go = { "gofmt" },
-                lua = { "stylua" },
+                rust   = { "rustfmt" },
+                go     = { "gofmt" },
+                lua    = { "stylua" },
+                eruby  = { "htmlbeautifier" },  -- .erb / .html.erb
+                -- .rb: handled by ruby_lsp BufWritePre autocmd in lsp.lua
             },
             formatters = {
                 stylua = {
                     prepend_args = { "--indent-type", "Spaces", "--indent-width", "4" },
                 },
-                rubocop = {
-                    args = { "--autocorrect-all", "--format", "quiet", "--stderr", "--stdin", "$FILENAME" },
-                    exit_codes = { 0, 1 },
+                htmlbeautifier = {
+                    command = "/Users/camk/.local/share/mise/installs/ruby/latest/bin/htmlbeautifier",
                 },
             },
             format_on_save = function(bufnr)
                 local ft = vim.bo[bufnr].filetype
-                if ft == "c" or ft == "cpp" then return nil end
+                -- skip c/cpp (uncrustify), skip .rb (ruby_lsp autocmd handles it)
+                if ft == "c" or ft == "cpp" or ft == "ruby" then return nil end
                 return { timeout_ms = 5000, lsp_fallback = true }
             end,
         },
@@ -32,7 +32,7 @@ return {
             local lint = require("lint")
             lint.linters_by_ft = {
                 python = { "ruff" },
-                ruby = { "rubocop" },
+                -- ruby diagnostics come from ruby_lsp (rubocop integrated)
             }
             vim.api.nvim_create_autocmd({ "BufWritePost" }, {
                 callback = function()
