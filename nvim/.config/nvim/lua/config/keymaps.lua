@@ -7,22 +7,20 @@ map("n", "<leader>d", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnosti
 
 map("n", "<leader>h", function()
     local lines = {
-        "  LSP                          Search",
-        "  gd  definition               <leader>sf  files",
-        "  gD  declaration              <leader>sg  grep",
-        "  gi  implementation           <leader>sw  word in buffer",
-        "  gr  references               <leader>sb  buffers",
-        "  gh  source/header (C/C++)",
-        "  <leader>i  hover info         Pins",
-        "  [d  prev error               <leader>pa  pin file",
-        "  ]d  next error               <leader>pp  menu",
-        "                               <leader>p1-4  jump to pin",
-        "  Motion",
-        "  s   flash jump               Text Objects",
-        "  S   flash treesitter         af/if  function",
-        "                               ac/ic  class",
-        "  Git                          aa/ia  argument",
-        "  <leader>g  lazygit           ]f/[f  next/prev fn",
+        "  Flash                        LSP Navigation",
+        "  s        jump                gd   definition",
+        "  S        treesitter jump     gD   declaration",
+        "  r        remote (operator)   gi   implementation",
+        "  R        TS search (op/vis)  gr   references",
+        "                               gh   source/header (C/C++)",
+        "  Surround (gz)                <leader>i  hover info",
+        "  gza  add    gzd  delete      [d / ]d  prev/next error",
+        "  gzr  replace",
+        "",
+        "  Text Objects                 Treesitter Moves",
+        "  af/if  function              ]f / [f  next/prev function",
+        "  ac/ic  class                 ]t / [t  next/prev class",
+        "  aa/ia  argument",
     }
 
     local buf = vim.api.nvim_create_buf(false, true)

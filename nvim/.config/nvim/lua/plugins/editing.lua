@@ -1,14 +1,16 @@
 return {
-	{ "numToStr/Comment.nvim", event = "VeryLazy", opts = {} },
-	{ "windwp/nvim-autopairs", event = "InsertEnter", opts = {} },
-	{ "windwp/nvim-ts-autotag", ft = { "html", "eruby" }, opts = {} },
-	{
-		"folke/flash.nvim",
-		event = "VeryLazy",
-		opts = {},
-		keys = {
-			{ "s", function() require("flash").jump() end,       mode = { "n", "x", "o" }, desc = "Flash Jump" },
-			{ "S", function() require("flash").treesitter() end, mode = { "n", "x", "o" }, desc = "TS Jump" },
-		},
-	},
+    { "numToStr/Comment.nvim",  event = "InsertEnter", opts = {} },
+    { "windwp/nvim-autopairs",  event = "InsertEnter", opts = {} },
+    { "windwp/nvim-ts-autotag", ft = { "html", "eruby" }, opts = {} },
+    {
+        "folke/flash.nvim",
+        event = "VeryLazy",
+        opts = {},
+        keys = {
+            { "s", function() require("flash").jump()              end, mode = { "n", "x", "o" }, desc = "Flash Jump" },
+            { "S", function() require("flash").treesitter()        end, mode = { "n", "x", "o" }, desc = "Flash Treesitter" },
+            { "r", function() require("flash").remote()            end, mode = "o",               desc = "Flash Remote" },
+            { "R", function() require("flash").treesitter_search() end, mode = { "o", "x" },      desc = "Flash TS Search" },
+        },
+    },
 }
