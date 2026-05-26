@@ -17,7 +17,7 @@ return {
 				default = { "lsp", "path", "snippets", "buffer" },
 			},
 			completion = {
-				documentation = { auto_show = true },
+				documentation = { auto_show = false },
 			},
 			snippets = {
 				expand = function(snippet)

@@ -1,6 +1,6 @@
+# Generated dynamically by dotfiles setup.sh
 [tools]
-ruby    = "latest"
-python  = "latest"
-node    = "lts"
-go      = "latest"
+python    = "latest"
 rust    = "latest"
+lua    = "latest"
+node    = "lts"

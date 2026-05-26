@@ -1,5 +1,5 @@
 #!/bin/bash
-FILE="$HOME/dotfiles/config/aliases"
+FILE="$DOTFILES/config/aliases"
 
 awk '
 /^[[:space:]]*$/ { next }
@@ -22,7 +22,17 @@ awk '
 }
 /^[a-zA-Z_][a-zA-Z0-9_]*[[:space:]]*\(/ {
     match($0, /^[a-zA-Z_][a-zA-Z0-9_]*/)
-    printf "  \033[1;32m%-16s\033[0m  [fn]\n", substr($0, 1, RLENGTH) "()"
+    name = substr($0, 1, RLENGTH) "()"
+    desc = ""
+    idx = index($0, "#")
+    if (idx > 0) {
+        desc = substr($0, idx + 1)
+        gsub(/^[[:space:]]+|[[:space:]]+$/, "", desc)
+    }
+    if (desc == "") {
+        desc = "[fn]"
+    }
+    printf "  \033[1;32m%-16s\033[0m  %s\n", name, desc
     next
 }
 ' "$FILE"

@@ -1,4 +1,6 @@
-GPATH
-GRTAGS
-GTAGS
-cscope.out
+.claude/
+tmp/
+config/ghostty/active_theme
+nvim/lua/config/theme.lua
+
+

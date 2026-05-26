@@ -1,6 +1,18 @@
 return {
 	{
 		"tpope/vim-rails",
+		enabled = function()
+			local ok, servers = pcall(require, "config.lsp_servers")
+			if not ok or not servers or not servers.extra_lsp then
+				return false
+			end
+			for _, v in ipairs(servers.extra_lsp) do
+				if v == "ruby_lsp" then
+					return true
+				end
+			end
+			return false
+		end,
 		ft = { "ruby", "eruby" },
 		config = function()
 			vim.api.nvim_create_autocmd("FileType", {

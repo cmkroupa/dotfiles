@@ -7,7 +7,17 @@ return {
                 rust   = { "rustfmt" },
                 go     = { "gofmt" },
                 lua    = { "stylua" },
-                eruby  = { "htmlbeautifier" },  -- .erb / .html.erb
+                eruby  = function()
+                    local ok, servers = pcall(require, "config.lsp_servers")
+                    if ok and servers and servers.extra_lsp then
+                        for _, v in ipairs(servers.extra_lsp) do
+                            if v == "ruby_lsp" then
+                                return { "htmlbeautifier" }
+                            end
+                        end
+                    end
+                    return {}
+                end,
                 -- .rb: handled by ruby_lsp BufWritePre autocmd in lsp.lua
             },
             formatters = {
@@ -15,7 +25,7 @@ return {
                     prepend_args = { "--indent-type", "Spaces", "--indent-width", "4" },
                 },
                 htmlbeautifier = {
-                    command = "/Users/camk/.local/share/mise/installs/ruby/latest/bin/htmlbeautifier",
+                    command = vim.fn.expand("$HOME") .. "/.local/share/mise/installs/ruby/latest/bin/htmlbeautifier",
                 },
             },
             format_on_save = function(bufnr)

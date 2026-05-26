@@ -1,18 +1,13 @@
--- Add or remove language names to control which LSPs and formatters Mason installs.
--- After editing, restart nvim and run :MasonToolsInstall.
+-- Generated dynamically by dotfiles setup.sh
 local enabled = {
-  "ruby",
   "python",
---  "go",
   "rust",
-  "lua",
   "c",
+  "lua",
   "web",
 }
 
 -- ── Mapping ───────────────────────────────────────────────────────────────────
--- Each entry: mason_lsp (Mason-installed), mason_tools (formatters/linters),
---             extra_lsp (installed outside Mason, e.g. via bundle/cargo).
 local map = {
   ruby   = { extra_lsp    = { "ruby_lsp" },
              mason_tools  = { "rubocop" } },
@@ -27,7 +22,6 @@ local map = {
   web    = { mason_lsp    = { "html", "cssls", "emmet_ls" } },
 }
 
--- ── Build lists ───────────────────────────────────────────────────────────────
 local result = { mason_lsp = {}, mason_tools = {}, extra_lsp = {} }
 
 for _, lang in ipairs(enabled) do

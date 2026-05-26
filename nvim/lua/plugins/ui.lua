@@ -1,12 +1,20 @@
+local ok, active_theme = pcall(require, "config.theme")
+if not ok or not active_theme then
+	active_theme = "catppuccin"
+end
+
 return {
-	-- theme (priority ensures it loads before everything else)
+	-- theme support (priority ensures they load before everything else)
+	{ "folke/tokyonight.nvim", lazy = false, priority = 1001 },
+	{ "ellisonleao/gruvbox.nvim", lazy = false, priority = 1001 },
+	{ "shaunsingh/nord.nvim", lazy = false, priority = 1001 },
 	{
 		"catppuccin/nvim",
 		name = "catppuccin",
 		priority = 1000,
 		lazy = false,
 		opts = {
-			flavour = "mocha",
+			flavour = "macchiato",
 			integrations = {
 				bufferline        = true,
 				gitsigns          = true,
@@ -27,7 +35,15 @@ return {
 		},
 		config = function(_, opts)
 			require("catppuccin").setup(opts)
-			vim.cmd.colorscheme("catppuccin")
+			if active_theme == "tokyonight" then
+				vim.cmd.colorscheme("tokyonight-night")
+			elseif active_theme == "gruvbox" then
+				vim.cmd.colorscheme("gruvbox")
+			elseif active_theme == "nord" then
+				vim.cmd.colorscheme("nord")
+			else
+				vim.cmd.colorscheme("catppuccin")
+			end
 		end,
 	},
 	-- buffer tabline (catppuccin highlights applied after theme loads)
@@ -57,9 +73,20 @@ return {
 		priority = 999,
 		dependencies = { "catppuccin/nvim", "SmiteshP/nvim-navic" },
 		config = function()
+			local lualine_theme = "auto"
+			if active_theme == "catppuccin" then
+				lualine_theme = "auto"
+			elseif active_theme == "tokyonight" then
+				lualine_theme = "tokyonight"
+			elseif active_theme == "gruvbox" then
+				lualine_theme = "gruvbox"
+			elseif active_theme == "nord" then
+				lualine_theme = "nord"
+			end
+
 			require("lualine").setup({
 				options = {
-					theme = "catppuccin-mocha",
+					theme = lualine_theme,
 					globalstatus = true,
 					section_separators = "",
 					component_separators = "|",

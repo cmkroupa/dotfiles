@@ -8,6 +8,7 @@ if ! command -v mise &>/dev/null; then
   curl https://mise.run | sh
   export PATH="$HOME/.local/share/mise/bin:$PATH"
 fi
-mise install
+DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+(cd "$DOTFILES" && mise install)
 
 echo "==> Runtimes done."

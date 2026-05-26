@@ -4,7 +4,7 @@ font-style  = Regular
 font-size   = 13
 
 # ── Theme ─────────────────────────────────────────────────────────────────────
-theme = Catppuccin Mocha
+# theme = Catppuccin Mocha
 
 # ── Window ────────────────────────────────────────────────────────────────────
 window-theme           = ghostty
@@ -34,3 +34,4 @@ mouse-scroll-multiplier = 0.95
 
 # ── Platform-specific overrides (written by setup.sh --terminal) ───────────────
 config-file = ?~/.config/ghostty/platform.conf
+config-file = ?~/.config/ghostty/active_theme

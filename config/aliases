@@ -3,14 +3,14 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias home='cd ~'
-alias dotfiles='cd ~/dotfiles'
+alias dotfiles='cd $DOTFILES'
 
 # ── Files ─────────────────────────────────────────────────────────────────────
 alias ls='eza --icons --group-directories-first'
 alias ll='eza -la --icons --group-directories-first --git'
 alias cat='bat --paging=never'
 
-head() {
+head() { # View start of file using bat
     local n=10
     if [[ $1 == -n ]]; then n=$2; shift 2
     elif [[ $1 =~ ^-[0-9]+$ ]]; then n=${1#-}; shift
@@ -18,7 +18,7 @@ head() {
     bat --paging=never -r ":$n" "$@"
 }
 
-tail() {
+tail() { # View end of file using bat
     for arg in "$@"; do [[ $arg == -f ]] && { command tail "$@"; return; }; done
     local n=10
     if [[ $1 == -n ]]; then n=$2; shift 2
@@ -41,7 +41,9 @@ alias gfh='git fetch'
 alias gbr='git branch'
 alias gsw='git switch'
 
-glg() { git log --oneline --graph --decorate -${1:-20}; }
+glg() { # View git log as a compact timeline graph
+  git log --oneline --graph --decorate -${1:-20};
+}
 
 # ── Search ────────────────────────────────────────────────────────────────────
 alias rg='rg --smart-case'
@@ -50,21 +52,39 @@ alias rgf='rg --files | rg'
 # ── C/C++ ─────────────────────────────────────────────────────────────────────
 # Initialise clangd LSP: generates compile_commands.json via dry-run (no actual build needed).
 # Usage: lspinit [path]   defaults to current directory
-lspinit() {
+lspinit() { # Generate Clangd compile_commands.json from Makefile
   local dir="${1:-.}"
-  (cd "$dir" && compiledb make -n) && echo "  compile_commands.json written to $dir — clangd will pick it up on next nvim open"
+  if ! command -v compiledb &>/dev/null; then
+    echo -e "\033[1;31mError: 'compiledb' utility is not installed.\033[0m"
+    echo -e "Clangd C/C++ LSP requires a \033[1;33mcompile_commands.json\033[0m file at your project root to find headers and compilation flags."
+    echo -e "To automatically generate it from your Makefile, please install compiledb:"
+    echo -e "  \033[1;32mpip install compiledb\033[0m"
+    echo -e "Alternatively, you can generate it using Bear: \033[1;32mbear -- make\033[0m"
+    return 1
+  fi
+  echo -e "\033[1;34m==> Generating compile_commands.json inside: $dir\033[0m"
+  (cd "$dir" && compiledb -n make -k -j8) && echo -e "  \033[1;32m[✔] compile_commands.json written successfully!\033[0m Clangd will pick it up on next Neovim open."
 }
 
 # ── Utilities ─────────────────────────────────────────────────────────────────
-alias aliases='bash ~/dotfiles/scripts/alias-help.sh'
+alias aliases='bash $DOTFILES/scripts/alias-help.sh'
+alias theme='bash $DOTFILES/scripts/theme.sh'
 alias path='echo $PATH | tr ":" "\n"'
 
-mkcd()   { mkdir -p "$1" && cd "$1"; }
-weather(){ curl "wttr.in/${1:-Toronto}?format=3"; }
-explain(){ curl "cheat.sh/$1"; }
-pword()  { tr -dc 'A-Za-z0-9!@#$%^&*' < /dev/urandom | head -c ${1:-20}; echo; }
+mkcd() { # Create and enter a new directory
+  mkdir -p "$1" && cd "$1";
+}
+weather() { # Get weather forecast by city
+  curl "wttr.in/${1:-Toronto}?format=3";
+}
+explain() { # Query cheat.sh community command sheets
+  curl "cheat.sh/$1";
+}
+pword() { # Generate a secure random password
+  LC_ALL=C tr -dc 'A-Za-z0-9!@#$%^&*' < /dev/urandom | command head -c ${1:-20}; echo;
+}
 
-reload() {
+reload() { # Reload active shell profile configurations
   [[ -n "$ZSH_VERSION" ]]  && source ~/.zshrc  && echo "zsh reloaded"  && return
   [[ -n "$BASH_VERSION" ]] && source ~/.bashrc && echo "bash reloaded" && return
   echo "unknown shell"

@@ -15,13 +15,13 @@ bindkey "^[[B" down-line-or-beginning-search
 [[ -x /usr/local/bin/brew ]]    && eval "$(/usr/local/bin/brew shellenv)"     # macOS Intel
 [[ -d /opt/homebrew/opt/llvm ]] && export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
 [[ -d "$HOME/.local/bin" ]]     && export PATH="$HOME/.local/bin:$PATH"
-[[ -d "$HOME/dotfiles/bin" ]] && export PATH="$HOME/dotfiles/bin:$PATH"
+[[ -d "$DOTFILES/bin" ]] && export PATH="$DOTFILES/bin:$PATH"
 
 # ── Completions ───────────────────────────────────────────────────────────────
 autoload -Uz compinit && compinit
 
 # ── Aliases & functions ───────────────────────────────────────────────────────
-source ~/dotfiles/config/aliases
+source $DOTFILES/config/aliases
 [[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
 
 # ── Plugins (path varies by OS / package manager) ─────────────────────────────
@@ -52,7 +52,7 @@ if command -v conda &>/dev/null || [[ -f /opt/anaconda3/bin/conda ]]; then
 fi
 
 # ── Mise ──────────────────────────────────────────────────────────────────────
-command -v mise &>/dev/null && eval "$(mise activate zsh)"
+[[ -d "$HOME/.local/share/mise/shims" ]] && export PATH="$HOME/.local/share/mise/shims:$PATH"
 
 # ── Zoxide (smart cd) ─────────────────────────────────────────────────────────
 command -v zoxide &>/dev/null && eval "$(zoxide init zsh --cmd cd)"
