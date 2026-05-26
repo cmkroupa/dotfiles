@@ -12,6 +12,7 @@ map("n", "<leader>h", function()
         "  S        treesitter jump     gD   declaration",
         "  r        remote (operator)   gi   implementation",
         "  R        TS search (op/vis)  gr   references",
+        "  <C-s>    toggle in /search",
         "                               gh   source/header (C/C++)",
         "  Surround (gz)                <leader>i  hover info",
         "  gza  add    gzd  delete      [d / ]d  prev/next error",
