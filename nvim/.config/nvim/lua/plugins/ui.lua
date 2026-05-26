@@ -65,11 +65,11 @@ return {
             spec = {
                 { "<leader>s", group = "Search" },
                 { "<leader>f", group = "Format" },
-                { "<leader>p", group = "Pins" },
+                { "<leader>p", group = "Pins", icon = { icon = "󰐃", color = "cyan" } },
                 { "<leader>r", group = "Rails" },
                 { "<leader>d", group = "Diagnostics" },
                 { "<leader>l", group = "Lazy" },
-                { "<leader>t", group = "Terminal" },
+                { "<leader>h", group = "Help" },
                 { "<leader>g", icon = { icon = "󰊢", color = "red" } },
                 { "gz", group = "Surround" },
                 { "[",  group = "Prev" },
