@@ -3,14 +3,19 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-if ! command -v stow &>/dev/null; then
-  echo "Error: GNU stow required."
-  echo "  Ubuntu/Debian: sudo apt install stow"
-  echo "  macOS:         brew install stow"
-  exit 1
+PACKAGES=(shell zsh bash tmux starship nvim mise)
+STOW_IGNORE=(--ignore='packages.*\.txt' --ignore='install\.sh')
+
+# ── OS detection ───────────────────────────────────────────────────────────────
+if [[ "$(uname)" == "Darwin" ]]; then
+  OS=macOS
+elif [[ -f /etc/os-release ]]; then
+  OS=$(. /etc/os-release && echo "$NAME")
+else
+  OS=unknown
 fi
 
-PACKAGES=(shell zsh bash tmux starship nvim mise)
+echo "Detected OS: $OS"
 
 # ── Package manager detection ──────────────────────────────────────────────────
 if command -v brew &>/dev/null; then
@@ -25,13 +30,29 @@ else
   PM=none
 fi
 
+echo "Detected package manager: $PM"
+echo ""
+
+if ! command -v stow &>/dev/null; then
+  echo "Error: GNU stow required."
+  case "$PM" in
+    apt)    echo "  Run: sudo apt install stow" ;;
+    brew)   echo "  Run: brew install stow" ;;
+    pacman) echo "  Run: sudo pacman -S stow" ;;
+    dnf)    echo "  Run: sudo dnf install stow" ;;
+    *)      echo "  Install stow via your package manager." ;;
+  esac
+  exit 1
+fi
+
+# ── Package installer ──────────────────────────────────────────────────────────
 install_pkgs() {
   case "$PM" in
     brew)   brew install "$@" ;;
     apt)    sudo apt install -y "$@" ;;
     pacman) sudo pacman -S --noconfirm "$@" ;;
     dnf)    sudo dnf install -y "$@" ;;
-    none)   echo "  Warning: no supported package manager found. Install manually: $*" ;;
+    none)   echo "  Warning: no package manager found. Install manually: $*" ;;
   esac
 }
 
@@ -48,14 +69,21 @@ for pkg in "${PACKAGES[@]}"; do
 done
 
 if [[ ${#pkgs[@]} -gt 0 ]]; then
-  echo "Installing packages via $PM: ${pkgs[*]}"
+  echo "Installing packages: ${pkgs[*]}"
   install_pkgs "${pkgs[@]}"
   echo ""
 fi
 
-# ── Stow with conflict handling ────────────────────────────────────────────────
-STOW_IGNORE=(--ignore='packages.*\.txt' --ignore='install\.sh')
+# ── Per-module custom installers ───────────────────────────────────────────────
+for pkg in "${PACKAGES[@]}"; do
+  [[ -f "$pkg/install.sh" ]] || continue
+  echo "Running $pkg installer..."
+  bash "$pkg/install.sh"
+done
 
+echo ""
+
+# ── Stow with conflict handling ────────────────────────────────────────────────
 safe_stow() {
   local pkg="$1"
   local conflicts
@@ -76,16 +104,6 @@ safe_stow() {
   echo "  stowed: $pkg"
 }
 
-# ── Per-module custom installers ───────────────────────────────────────────────
-for pkg in "${PACKAGES[@]}"; do
-  [[ -f "$pkg/install.sh" ]] || continue
-  echo "Running $pkg installer..."
-  bash "$pkg/install.sh"
-done
-
-echo ""
-
-# ── Stow each module ───────────────────────────────────────────────────────────
 for pkg in "${PACKAGES[@]}"; do
   safe_stow "$pkg"
 done
