@@ -1,63 +1,34 @@
-# ── Navigation ────────────────────────────────────────────────────────────────
 alias ..='cd ..'
 alias ...='cd ../..'
-alias ....='cd ../../..'
-alias home='cd ~'
-
-# ── Files ─────────────────────────────────────────────────────────────────────
 alias ls='eza --icons --group-directories-first'
 alias ll='eza -la --icons --group-directories-first --git'
 alias cat='bat --paging=never'
-
-# ── Editor ────────────────────────────────────────────────────────────────────
 alias v='nvim'
-
-# ── Git ───────────────────────────────────────────────────────────────────────
 alias g='git'
-alias vgit='lazygit'
 alias gst='git status'
-alias gad='git add'
 alias gcm='git commit -m'
 alias gph='git push'
-alias gfh='git fetch'
-alias gbr='git branch'
 alias gsw='git switch'
-
-glg() { git log --oneline --graph --decorate -${1:-20}; }
-
-# ── Search ────────────────────────────────────────────────────────────────────
 alias rg='rg --smart-case'
-alias rgf='rg --files | rg'
-
-# ── Utilities ─────────────────────────────────────────────────────────────────
 alias path='echo $PATH | tr ":" "\n"'
 
-mkcd()   { mkdir -p "$1" && cd "$1"; }
-weather() { curl "wttr.in/${1:-Toronto}?format=3"; }
-reload()  {
-  [[ -n "$ZSH_VERSION" ]]  && source ~/.zshrc  && echo "reloaded" && return
-  [[ -n "$BASH_VERSION" ]] && source ~/.bashrc && echo "reloaded" && return
+glg() { git log --oneline --graph --decorate -${1:-20}; }
+mkcd() { mkdir -p "$1" && cd "$1"; }
+reload() {
+  [[ -n "$ZSH_VERSION" ]]  && source ~/.zshrc  && return
+  [[ -n "$BASH_VERSION" ]] && source ~/.bashrc && return
 }
-
-# ── C/C++ clangd LSP ──────────────────────────────────────────────────────────
 lspinit() {
-  if ! command -v compiledb &>/dev/null || ! command -v jq &>/dev/null; then
-    echo "Error: 'compiledb' and 'jq' are required."
-    return 1
-  fi
-  local root
-  root=$(git -C "${1:-.}" rev-parse --show-toplevel 2>/dev/null) || root="${1:-.}"
+  command -v compiledb &>/dev/null && command -v jq &>/dev/null || { echo "requires compiledb and jq"; return 1; }
+  local root; root=$(git -C "${1:-.}" rev-parse --show-toplevel 2>/dev/null) || root="${1:-.}"
   local tmp_files=()
   while IFS= read -r dir; do
     local tmp; tmp=$(mktemp /tmp/ccXXXXXX.json)
-    if (cd "$dir" && compiledb -f -o "$tmp" make -n -k 2>/dev/null) && [[ -s "$tmp" ]]; then
-      tmp_files+=("$tmp"); echo "  ✔ $dir"
-    else
-      rm -f "$tmp"
-    fi
+    (cd "$dir" && compiledb -f -o "$tmp" make -n -k 2>/dev/null) && [[ -s "$tmp" ]] \
+      && tmp_files+=("$tmp") || rm -f "$tmp"
   done < <(find "$root" -maxdepth 2 -name "[Mm]akefile" -not -path "*/build/*" -printf "%h\n" | sort -u)
-  [[ ${#tmp_files[@]} -eq 0 ]] && echo "No compile_commands.json generated." && return 1
+  [[ ${#tmp_files[@]} -eq 0 ]] && { echo "no compile_commands.json generated"; return 1; }
   jq -s 'add | unique_by(.file)' "${tmp_files[@]}" > "$root/compile_commands.json"
   rm -f "${tmp_files[@]}"
-  echo "compile_commands.json written to $root"
+  echo "written to $root/compile_commands.json"
 }

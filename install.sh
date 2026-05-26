@@ -4,118 +4,61 @@ set -e
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 PACKAGES=(shell zsh bash tmux starship nvim mise)
-STOW_IGNORE=(--ignore='packages.*\.txt' --ignore='install\.sh')
+STOW_OPTS=(--ignore='packages.*\.txt' --ignore='install\.sh')
 BAK_DIR="$(pwd)/.bak"
 
-# ── OS detection ───────────────────────────────────────────────────────────────
-if [[ "$(uname)" == "Darwin" ]]; then
-  OS=macOS
-elif [[ -f /etc/os-release ]]; then
-  OS=$(. /etc/os-release && echo "$NAME")
-else
-  OS=unknown
-fi
+[[ "$(uname)" == "Darwin" ]] && OS=macOS || OS=$(. /etc/os-release 2>/dev/null && echo "$NAME" || echo unknown)
+command -v brew   &>/dev/null && PM=brew   ||
+command -v apt    &>/dev/null && PM=apt    ||
+command -v pacman &>/dev/null && PM=pacman ||
+command -v dnf    &>/dev/null && PM=dnf    || PM=none
 
-echo "Detected OS: $OS"
-
-# ── Package manager detection ──────────────────────────────────────────────────
-if command -v brew &>/dev/null; then
-  PM=brew
-elif command -v apt &>/dev/null; then
-  PM=apt
-elif command -v pacman &>/dev/null; then
-  PM=pacman
-elif command -v dnf &>/dev/null; then
-  PM=dnf
-else
-  PM=none
-fi
-
-echo "Detected package manager: $PM"
-echo ""
+echo "OS: $OS  |  PM: $PM"
 
 if ! command -v stow &>/dev/null; then
-  echo "Error: GNU stow required."
   case "$PM" in
-    apt)    echo "  Run: sudo apt install stow" ;;
-    brew)   echo "  Run: brew install stow" ;;
-    pacman) echo "  Run: sudo pacman -S stow" ;;
-    dnf)    echo "  Run: sudo dnf install stow" ;;
-    *)      echo "  Install stow via your package manager." ;;
+    apt) cmd="sudo apt install stow" ;; brew) cmd="brew install stow" ;;
+    pacman) cmd="sudo pacman -S stow" ;; dnf) cmd="sudo dnf install stow" ;;
+    *) cmd="install stow via your package manager" ;;
   esac
-  exit 1
+  echo "Error: stow required — $cmd"; exit 1
 fi
 
-if [[ -d "$BAK_DIR" ]]; then
-  echo "Error: .bak/ already exists — a previous backup is present."
-  echo "  Run ./unlink.sh to restore it, or remove .bak/ manually."
-  exit 1
-fi
+[[ -d "$BAK_DIR" ]] && { echo "Error: .bak/ exists — run ./unlink.sh first"; exit 1; }
 
-# ── Package installer ──────────────────────────────────────────────────────────
-install_pkgs() {
-  case "$PM" in
-    brew)   brew install "$@" ;;
-    apt)    sudo apt install -y "$@" ;;
-    pacman) sudo pacman -S --noconfirm "$@" ;;
-    dnf)    sudo dnf install -y "$@" ;;
-    none)   echo "  Warning: no package manager found. Install manually: $*" ;;
-  esac
-}
-
-# ── Collect packages for detected PM ──────────────────────────────────────────
 pkgs=()
 for pkg in "${PACKAGES[@]}"; do
-  file="$pkg/packages.$PM.txt"
-  [[ -f "$file" ]] || file="$pkg/packages.txt"
-  [[ -f "$file" ]] || continue
+  f="$pkg/packages.$PM.txt"; [[ -f "$f" ]] || f="$pkg/packages.txt"
+  [[ -f "$f" ]] || continue
   while IFS= read -r line; do
-    [[ -z "$line" || "$line" == "#"* ]] && continue
-    pkgs+=("$line")
-  done < "$file"
+    [[ -z "$line" || "$line" == "#"* ]] || pkgs+=("$line")
+  done < "$f"
 done
 
 if [[ ${#pkgs[@]} -gt 0 ]]; then
-  echo "Installing packages: ${pkgs[*]}"
-  install_pkgs "${pkgs[@]}"
-  echo ""
+  case "$PM" in
+    brew)   brew install "${pkgs[@]}" ;;
+    apt)    sudo apt install -y "${pkgs[@]}" ;;
+    pacman) sudo pacman -S --noconfirm "${pkgs[@]}" ;;
+    dnf)    sudo dnf install -y "${pkgs[@]}" ;;
+    none)   echo "No package manager — install manually: ${pkgs[*]}" ;;
+  esac
 fi
 
-# ── Per-module custom installers ───────────────────────────────────────────────
 for pkg in "${PACKAGES[@]}"; do
-  [[ -f "$pkg/install.sh" ]] || continue
-  echo "Running $pkg installer..."
-  bash "$pkg/install.sh"
+  [[ -f "$pkg/install.sh" ]] && bash "$pkg/install.sh"
 done
 
-echo ""
-
-# ── Stow with conflict handling ────────────────────────────────────────────────
-safe_stow() {
-  local pkg="$1"
-  local conflicts
-  conflicts=$(stow --simulate --target="$HOME" "${STOW_IGNORE[@]}" "$pkg" 2>&1 \
+for pkg in "${PACKAGES[@]}"; do
+  conflicts=$(stow --simulate --target="$HOME" "${STOW_OPTS[@]}" "$pkg" 2>&1 \
     | grep -E "existing target is (not owned by stow|neither a link nor a directory)" || true)
-
-  if [[ -n "$conflicts" ]]; then
-    while IFS= read -r line; do
-      local target
-      target=$(echo "$line" | sed -E 's/.*existing target is (not owned by stow|neither a link nor a directory): //')
-      [[ -z "$target" ]] && continue
-      local dest="$BAK_DIR/$target"
-      mkdir -p "$(dirname "$dest")"
-      echo "  backing up: ~/$target"
-      mv "$HOME/$target" "$dest"
-    done <<< "$conflicts"
-  fi
-
-  stow --target="$HOME" "${STOW_IGNORE[@]}" "$pkg"
-  echo "  stowed: $pkg"
-}
-
-for pkg in "${PACKAGES[@]}"; do
-  safe_stow "$pkg"
+  while IFS= read -r line; do
+    target=$(echo "$line" | sed -E 's/.*existing target is (not owned by stow|neither a link nor a directory): //')
+    [[ -z "$target" ]] && continue
+    mkdir -p "$(dirname "$BAK_DIR/$target")"
+    mv "$HOME/$target" "$BAK_DIR/$target" && echo "  backed up: ~/$target"
+  done <<< "$conflicts"
+  stow --target="$HOME" "${STOW_OPTS[@]}" "$pkg" && echo "  stowed: $pkg"
 done
 
-echo ""
 echo "Done. Run: source ~/.zshrc"
