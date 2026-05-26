@@ -1,5 +1,4 @@
 local servers = require("config.lsp_servers")
-local all_lsp = vim.list_extend(vim.deepcopy(servers.mason_lsp), servers.extra_lsp)
 
 return {
     { "williamboman/mason.nvim", opts = {} },
@@ -9,19 +8,13 @@ return {
     },
     { "williamboman/mason-lspconfig.nvim",
         dependencies = { "williamboman/mason.nvim" },
-        opts = {
-            ensure_installed = servers.mason_lsp,
-            automatic_installation = { exclude = { "solargraph" } },
-        },
+        opts = { ensure_installed = servers.mason_lsp },
     },
     { "neovim/nvim-lspconfig",
         dependencies = { "williamboman/mason-lspconfig.nvim" },
         config = function()
-            vim.lsp.enable("solargraph", false)
-
-            vim.lsp.config("ruby_lsp", { init_options = { formatter = "rubocop" } })
             vim.lsp.config("emmet_ls", { filetypes = { "html", "eruby", "css", "scss" } })
-            vim.lsp.config("clangd", { cmd = { "clangd", "--fallback-style=LLVM", "--header-insertion=never" } })
+            vim.lsp.config("clangd",   { cmd = { "clangd", "--fallback-style=LLVM", "--header-insertion=never" } })
             vim.lsp.config("lua_ls", {
                 settings = {
                     Lua = {
@@ -32,15 +25,7 @@ return {
                 },
             })
 
-            vim.lsp.enable(all_lsp)
-
-            vim.api.nvim_create_autocmd("BufWritePre", {
-                callback = function(args)
-                    if vim.bo[args.buf].filetype == "ruby" then
-                        vim.lsp.buf.format({ name = "ruby_lsp", timeout_ms = 5000, bufnr = args.buf })
-                    end
-                end,
-            })
+            vim.lsp.enable(servers.mason_lsp)
 
             vim.api.nvim_create_autocmd("LspAttach", {
                 callback = function(args)
@@ -57,9 +42,9 @@ return {
                         if ft == "c" or ft == "cpp" then vim.cmd("ClangdSwitchSourceHeader")
                         else vim.lsp.buf.declaration() end
                     end, ext("Switch Source/Header"))
-                    map("n", "K",  vim.lsp.buf.hover,        ext("Hover Docs"))
-                    map("n", "[d", vim.diagnostic.goto_prev,  ext("Prev Error"))
-                    map("n", "]d", vim.diagnostic.goto_next,  ext("Next Error"))
+                    map("n", "K",  vim.lsp.buf.hover,       ext("Hover Docs"))
+                    map("n", "[d", vim.diagnostic.goto_prev, ext("Prev Error"))
+                    map("n", "]d", vim.diagnostic.goto_next, ext("Next Error"))
                 end,
             })
         end,
