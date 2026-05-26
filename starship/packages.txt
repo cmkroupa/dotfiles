@@ -1,0 +1,2 @@
+# starship is not in apt — install manually:
+# curl -sS https://starship.rs/install.sh | sh
