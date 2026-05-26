@@ -1,5 +1,5 @@
 #!/bin/bash
-FILE="$HOME/dotfiles/command_aliases"
+FILE="$HOME/dotfiles/config/aliases"
 
 awk '
 /^[[:space:]]*$/ { next }

@@ -8,12 +8,13 @@ usage() {
   cat <<EOF
 Usage: $(basename "$0") [flags]
 
+Removes symlinks and injected shell lines created by setup.sh.
+Does NOT uninstall packages or language runtimes.
+
 Flags (combinable):
   --all        Run --terminal and --nvim
-  --terminal   Packages (tmux/starship/zoxide/eza/bat/fonts), link configs, inject shell init
-  --nvim       Packages (neovim/lazygit/ripgrep/uncrustify), link config, install runtimes
-
-Edit nvim/lua/config/lsp_servers.lua to choose which language servers to install.
+  --terminal   Undo terminal setup
+  --nvim       Undo nvim setup
 EOF
 }
 
@@ -35,7 +36,7 @@ for arg in "$@"; do
   esac
 done
 
-[[ $RUN_TERMINAL -eq 1 ]] && bash "$SCRIPTS/terminal.sh"
-[[ $RUN_NVIM     -eq 1 ]] && bash "$SCRIPTS/nvim.sh" && bash "$SCRIPTS/runtimes.sh"
+[[ $RUN_TERMINAL -eq 1 ]] && bash "$SCRIPTS/undo_terminal.sh"
+[[ $RUN_NVIM     -eq 1 ]] && bash "$SCRIPTS/undo_nvim.sh"
 
 echo "All done."

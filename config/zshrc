@@ -21,7 +21,7 @@ bindkey "^[[B" down-line-or-beginning-search
 autoload -Uz compinit && compinit
 
 # ── Aliases & functions ───────────────────────────────────────────────────────
-source ~/dotfiles/command_aliases
+source ~/dotfiles/config/aliases
 [[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
 
 # ── Plugins (path varies by OS / package manager) ─────────────────────────────

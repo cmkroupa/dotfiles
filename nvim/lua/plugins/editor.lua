@@ -84,10 +84,6 @@ return {
 	},
 	{ "j-hui/fidget.nvim", opts = {} },
 	{
-		"mbbill/undotree",
-		keys = { { "<leader>u", "<cmd>UndotreeToggle<cr>", desc = "Undo Tree" } },
-	},
-	{
 		"andymass/vim-matchup",
 		init = function()
 			vim.g.matchup_matchparen_offscreen = { method = "status" }

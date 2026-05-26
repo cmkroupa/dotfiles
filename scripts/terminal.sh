@@ -3,19 +3,76 @@ set -e
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$DOTFILES/scripts/lib/detect_os.sh"
 
+echo "==> Installing terminal packages..."
+
+case "$OS" in
+  mac)
+    if ! command -v brew &>/dev/null; then
+      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      eval "$(/opt/homebrew/bin/brew shellenv)"
+    fi
+    brew install tmux fzf eza zoxide mise starship bat fd \
+                 zsh-syntax-highlighting zsh-autosuggestions
+    brew install --cask ghostty font-jetbrains-mono-nerd-font
+    ;;
+
+  arch)
+    sudo pacman -Syu --noconfirm
+    sudo pacman -S --noconfirm --needed \
+      zsh tmux ghostty fzf eza zoxide mise starship bat fd \
+      zsh-syntax-highlighting zsh-autosuggestions \
+      ttf-jetbrains-mono-nerd
+    ;;
+
+  ubuntu)
+    sudo apt update
+    sudo apt install -y zsh tmux fzf zoxide \
+      zsh-syntax-highlighting zsh-autosuggestions \
+      bat fd-find
+
+    # Ubuntu names bat→batcat and fd→fdfind; expose them under the normal names
+    mkdir -p "$HOME/.local/bin"
+    [[ -f /usr/bin/batcat ]] && ln -sf /usr/bin/batcat "$HOME/.local/bin/bat"
+    [[ -f /usr/bin/fdfind ]] && ln -sf /usr/bin/fdfind "$HOME/.local/bin/fd"
+
+    # eza (apt on 23.10+, binary fallback otherwise)
+    sudo apt install -y eza 2>/dev/null || {
+      EZ=$(curl -s "https://api.github.com/repos/eza-community/eza/releases/latest" \
+        | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+      curl -sLo /tmp/eza.tar.gz \
+        "https://github.com/eza-community/eza/releases/download/v${EZ}/eza_x86_64-unknown-linux-gnu.tar.gz"
+      tar xf /tmp/eza.tar.gz -C /tmp
+      sudo install /tmp/eza /usr/local/bin
+    }
+
+    # starship
+    curl -sS https://starship.rs/install.sh | sh -s -- --yes
+
+    # mise
+    curl https://mise.run | sh
+
+    # JetBrainsMono Nerd Font
+    mkdir -p ~/.local/share/fonts
+    curl -sLo /tmp/JetBrainsMono.zip \
+      "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip"
+    unzip -qo /tmp/JetBrainsMono.zip "*.ttf" -d ~/.local/share/fonts/JetBrainsMono
+    fc-cache -f
+    ;;
+esac
+
 echo "==> Linking terminal configs..."
 
 mkdir -p "$HOME/.config/mise"
-ln -sf "$DOTFILES/.tmux.conf"    "$HOME/.tmux.conf"
-ln -sf "$DOTFILES/starship.toml" "$HOME/.config/starship.toml"
-ln -sf "$DOTFILES/mise.toml"     "$HOME/.config/mise/config.toml"
+ln -sf "$DOTFILES/config/tmux.conf"    "$HOME/.tmux.conf"
+ln -sf "$DOTFILES/config/starship.toml" "$HOME/.config/starship.toml"
+ln -sf "$DOTFILES/config/mise.toml"    "$HOME/.config/mise/config.toml"
 
 # Ghostty: skip if Omarchy is installed — it manages ghostty/config and rewrites it on theme changes
 if [[ -d "$HOME/.config/omarchy" ]]; then
   echo "  Omarchy detected — skipping ghostty config (Omarchy manages it)"
 else
   mkdir -p "$HOME/.config/ghostty"
-  ln -sf "$DOTFILES/ghostty/config" "$HOME/.config/ghostty/config"
+  ln -sf "$DOTFILES/config/ghostty/config" "$HOME/.config/ghostty/config"
 
   echo "==> Writing ghostty platform config..."
   PLATFORM_CONF="$HOME/.config/ghostty/platform.conf"
@@ -42,11 +99,11 @@ fi
 # Shell rc injection — zsh on macOS, bash on Linux
 if [[ "$OS" == "mac" ]]; then
   CONF_FILE="$HOME/.zshrc"
-  INIT_CMDS=("source $DOTFILES/.zshrc")
+  INIT_CMDS=("source $DOTFILES/config/zshrc")
 else
   CONF_FILE="$HOME/.bashrc"
   INIT_CMDS=(
-    "source $DOTFILES/command_aliases"
+    "source $DOTFILES/config/aliases"
     "command -v mise     &>/dev/null && eval \"\$(mise activate bash)\""
     "command -v zoxide   &>/dev/null && eval \"\$(zoxide init bash --cmd cd)\""
     "command -v starship &>/dev/null && eval \"\$(starship init bash)\""

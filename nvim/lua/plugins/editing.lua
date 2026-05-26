@@ -11,10 +11,4 @@ return {
 			{ "S", function() require("flash").treesitter() end, mode = { "n", "x", "o" }, desc = "TS Jump" },
 		},
 	},
-	{
-		"ThePrimeagen/vim-be-good",
-		keys = {
-			{ "<leader>vg", "<cmd>VimBeGood<cr>" },
-		},
-	},
 }
