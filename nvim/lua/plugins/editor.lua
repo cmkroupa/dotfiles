@@ -73,7 +73,25 @@ return {
 			)
 		end,
 	},
-	{ "nvim-treesitter/nvim-treesitter-context", opts = { max_lines = 3 } },
+	{
+		"nvim-treesitter/nvim-treesitter-context",
+		opts = { max_lines = 3 },
+		config = function(_, opts)
+			local ctx = require("treesitter-context")
+			ctx.setup(opts)
+
+			local function refresh()
+				ctx.disable()
+				vim.schedule(ctx.enable)
+			end
+
+			-- Hide while moving so there's zero per-keypress overhead
+			vim.api.nvim_create_autocmd("CursorMoved", { callback = ctx.disable })
+			-- Show on idle and on buffer load
+			vim.api.nvim_create_autocmd("CursorHold",  { callback = refresh })
+			vim.api.nvim_create_autocmd("BufEnter",    { callback = refresh })
+		end,
+	},
 	{
 		"RRethy/vim-illuminate",
 		event = { "BufReadPost", "BufNewFile" },

@@ -136,7 +136,7 @@ return {
 		"lukas-reineke/indent-blankline.nvim",
 		main = "ibl",
 		opts = {
-			scope = { enabled = true, show_start = true },
+			scope = { enabled = false },
 		},
 	},
 	-- git signs in gutter
