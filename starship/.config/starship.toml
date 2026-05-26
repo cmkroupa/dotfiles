@@ -1,0 +1,33 @@
+format = "$directory${custom.git_dirty}${custom.git_ahead}${custom.git_clean}$character"
+add_newline = false
+command_timeout = 2000
+
+[directory]
+style = "bold blue"
+truncation_length = 4
+truncate_to_repo = true
+
+[custom.git_dirty]
+command = "git branch --show-current"
+when = 'git status --no-optional-locks --porcelain 2>/dev/null | grep -q .'
+ignore_timeout = true
+style = "bold red"
+format = "[ $output]($style) "
+
+[custom.git_ahead]
+command = "git branch --show-current"
+when = 'test -z "$(git status --no-optional-locks --porcelain 2>/dev/null)" && git rev-list "@{upstream}..HEAD" 2>/dev/null | grep -q .'
+ignore_timeout = true
+style = "bold yellow"
+format = "[ $output]($style) "
+
+[custom.git_clean]
+command = "git branch --show-current"
+when = 'test -z "$(git status --no-optional-locks --porcelain 2>/dev/null)" && ! git rev-list "@{upstream}..HEAD" 2>/dev/null | grep -q .'
+ignore_timeout = true
+style = "bold green"
+format = "[ $output]($style) "
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
