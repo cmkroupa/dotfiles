@@ -54,10 +54,13 @@ if [[ ${#pkgs[@]} -gt 0 ]]; then
 fi
 
 # ── Stow with conflict handling ────────────────────────────────────────────────
+STOW_IGNORE=(--ignore='packages.*\.txt' --ignore='install\.sh')
+
 safe_stow() {
   local pkg="$1"
   local conflicts
-  conflicts=$(stow --simulate --target="$HOME" "$pkg" 2>&1 | grep "existing target" || true)
+  conflicts=$(stow --simulate --target="$HOME" "${STOW_IGNORE[@]}" "$pkg" 2>&1 \
+    | grep "existing target is not owned by stow" || true)
 
   if [[ -n "$conflicts" ]]; then
     while IFS= read -r line; do
@@ -69,7 +72,7 @@ safe_stow() {
     done <<< "$conflicts"
   fi
 
-  stow --target="$HOME" "$pkg"
+  stow --target="$HOME" "${STOW_IGNORE[@]}" "$pkg"
   echo "  stowed: $pkg"
 }
 
