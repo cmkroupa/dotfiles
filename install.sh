@@ -5,6 +5,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 PACKAGES=(shell zsh bash tmux starship nvim mise)
 STOW_IGNORE=(--ignore='packages.*\.txt' --ignore='install\.sh')
+BAK_DIR="$(pwd)/.bak"
 
 # ── OS detection ───────────────────────────────────────────────────────────────
 if [[ "$(uname)" == "Darwin" ]]; then
@@ -42,6 +43,12 @@ if ! command -v stow &>/dev/null; then
     dnf)    echo "  Run: sudo dnf install stow" ;;
     *)      echo "  Install stow via your package manager." ;;
   esac
+  exit 1
+fi
+
+if [[ -d "$BAK_DIR" ]]; then
+  echo "Error: .bak/ already exists — a previous backup is present."
+  echo "  Run ./unlink.sh to restore it, or remove .bak/ manually."
   exit 1
 fi
 
@@ -84,9 +91,6 @@ done
 echo ""
 
 # ── Stow with conflict handling ────────────────────────────────────────────────
-BACKUP_LOG="$(pwd)/.dotfiles-backups"
-> "$BACKUP_LOG"
-
 safe_stow() {
   local pkg="$1"
   local conflicts
@@ -98,9 +102,10 @@ safe_stow() {
       local target
       target=$(echo "$line" | sed -E 's/.*existing target is (not owned by stow|neither a link nor a directory): //')
       [[ -z "$target" ]] && continue
+      local dest="$BAK_DIR/$target"
+      mkdir -p "$(dirname "$dest")"
       echo "  backing up: ~/$target"
-      mv "$HOME/$target" "$HOME/$target.bak"
-      echo "$HOME/$target" >> "$BACKUP_LOG"
+      mv "$HOME/$target" "$dest"
     done <<< "$conflicts"
   fi
 
