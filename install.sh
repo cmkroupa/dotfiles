@@ -84,6 +84,9 @@ done
 echo ""
 
 # ── Stow with conflict handling ────────────────────────────────────────────────
+BACKUP_LOG="$(pwd)/.dotfiles-backups"
+> "$BACKUP_LOG"
+
 safe_stow() {
   local pkg="$1"
   local conflicts
@@ -97,6 +100,7 @@ safe_stow() {
       [[ -z "$target" ]] && continue
       echo "  backing up: ~/$target"
       mv "$HOME/$target" "$HOME/$target.bak"
+      echo "$HOME/$target" >> "$BACKUP_LOG"
     done <<< "$conflicts"
   fi
 
