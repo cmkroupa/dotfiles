@@ -60,12 +60,12 @@ safe_stow() {
   local pkg="$1"
   local conflicts
   conflicts=$(stow --simulate --target="$HOME" "${STOW_IGNORE[@]}" "$pkg" 2>&1 \
-    | grep "existing target is not owned by stow" || true)
+    | grep -E "existing target is (not owned by stow|neither a link nor a directory)" || true)
 
   if [[ -n "$conflicts" ]]; then
     while IFS= read -r line; do
       local target
-      target=$(echo "$line" | sed 's/.*existing target is not owned by stow: //')
+      target=$(echo "$line" | sed -E 's/.*existing target is (not owned by stow|neither a link nor a directory): //')
       [[ -z "$target" ]] && continue
       echo "  backing up: ~/$target"
       mv "$HOME/$target" "$HOME/$target.bak"
