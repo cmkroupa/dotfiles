@@ -27,7 +27,7 @@ return {
 			},
 			auto_install = true,
 			highlight = { enable = true },
-			indent    = { enable = true },
+			indent    = { enable = false },
 			matchup   = { enable = false },
 			textobjects = {
 				select = {
@@ -80,16 +80,27 @@ return {
 			local ctx = require("treesitter-context")
 			ctx.setup(opts)
 
+			local visible = false
+
 			local function refresh()
 				ctx.disable()
-				vim.schedule(ctx.enable)
+				vim.schedule(function()
+					ctx.enable()
+					visible = true
+				end)
 			end
 
-			-- Hide while moving so there's zero per-keypress overhead
-			vim.api.nvim_create_autocmd("CursorMoved", { callback = ctx.disable })
-			-- Show on idle and on buffer load
-			vim.api.nvim_create_autocmd("CursorHold",  { callback = refresh })
-			vim.api.nvim_create_autocmd("BufEnter",    { callback = refresh })
+			-- Only call disable once per movement burst, not on every keypress
+			vim.api.nvim_create_autocmd("CursorMoved", {
+				callback = function()
+					if visible then
+						ctx.disable()
+						visible = false
+					end
+				end,
+			})
+			vim.api.nvim_create_autocmd("CursorHold", { callback = refresh })
+			vim.api.nvim_create_autocmd("BufEnter",   { callback = refresh })
 		end,
 	},
 	{
@@ -104,8 +115,9 @@ return {
 	{
 		"andymass/vim-matchup",
 		init = function()
-			vim.g.matchup_matchparen_offscreen = { method = "status" }
-			vim.g.matchup_treesitter_enabled = 0
+			vim.g.matchup_matchparen_deferred       = 1
+			vim.g.matchup_matchparen_offscreen      = { method = "status" }
+			vim.g.matchup_treesitter_enabled        = 0
 		end,
 	},
 }
