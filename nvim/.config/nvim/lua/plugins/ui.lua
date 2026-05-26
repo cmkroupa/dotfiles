@@ -68,6 +68,7 @@ return {
                 { "<leader>p", group = "Pins", icon = { icon = "󰐃", color = "cyan" } },
                 { "<leader>r", group = "Rails" },
                 { "<leader>d", group = "Diagnostics" },
+                { "<leader>i", group = "Info" },
                 { "<leader>l", group = "Lazy" },
                 { "<leader>h", group = "Help" },
                 { "<leader>g", icon = { icon = "󰊢", color = "red" } },

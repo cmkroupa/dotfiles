@@ -42,7 +42,7 @@ return {
                         if ft == "c" or ft == "cpp" then vim.cmd("ClangdSwitchSourceHeader")
                         else vim.lsp.buf.declaration() end
                     end, ext("Switch Source/Header"))
-                    map("n", "K",  vim.lsp.buf.hover,       ext("Hover Docs"))
+                    map("n", "<leader>i", vim.lsp.buf.hover, ext("Hover Info"))
                     map("n", "[d", vim.diagnostic.goto_prev, ext("Prev Error"))
                     map("n", "]d", vim.diagnostic.goto_next, ext("Next Error"))
                 end,

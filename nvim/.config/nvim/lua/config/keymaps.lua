@@ -12,7 +12,7 @@ map("n", "<leader>h", function()
         "  gi  implementation           <leader>sw  word in buffer",
         "  gr  references               <leader>sb  buffers",
         "  gh  source/header (C/C++)",
-        "  K   hover docs               Pins",
+        "  <leader>i  hover info         Pins",
         "  [d  prev error               <leader>pa  pin file",
         "  ]d  next error               <leader>pp  menu",
         "                               <leader>p1-4  jump to pin",
