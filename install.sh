@@ -10,7 +10,7 @@ if ! command -v stow &>/dev/null; then
   exit 1
 fi
 
-PACKAGES=(shell zsh bash tmux starship nvim)
+PACKAGES=(shell zsh bash tmux starship nvim mise)
 
 # ── Package manager detection ──────────────────────────────────────────────────
 if command -v brew &>/dev/null; then
@@ -73,6 +73,16 @@ safe_stow() {
   echo "  stowed: $pkg"
 }
 
+# ── Per-module custom installers ───────────────────────────────────────────────
+for pkg in "${PACKAGES[@]}"; do
+  [[ -f "$pkg/install.sh" ]] || continue
+  echo "Running $pkg installer..."
+  bash "$pkg/install.sh"
+done
+
+echo ""
+
+# ── Stow each module ───────────────────────────────────────────────────────────
 for pkg in "${PACKAGES[@]}"; do
   safe_stow "$pkg"
 done
