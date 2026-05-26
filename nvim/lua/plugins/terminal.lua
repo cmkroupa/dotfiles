@@ -4,7 +4,6 @@ return {
 		version = "*",
 		keys = {
 			{ "<leader>t", "<cmd>ToggleTerm<cr>", desc = "Terminal" },
-			{ "<C-\\>",    "<cmd>ToggleTerm<cr>", mode = "n" },
 		},
 		opts = {
 			direction = "float",

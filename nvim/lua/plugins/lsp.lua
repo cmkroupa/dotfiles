@@ -5,11 +5,6 @@ local all_lsp = vim.list_extend(vim.deepcopy(servers.mason_lsp), servers.extra_l
 return {
     { "williamboman/mason.nvim", opts = {} },
     {
-        "kosayoda/nvim-lightbulb",
-        event = { "BufReadPost", "BufNewFile" },
-        opts = { autocmd = { enabled = true } },
-    },
-    {
         "WhoIsSethDaniel/mason-tool-installer.nvim",
         dependencies = { "williamboman/mason.nvim" },
         opts = { ensure_installed = servers.mason_tools },

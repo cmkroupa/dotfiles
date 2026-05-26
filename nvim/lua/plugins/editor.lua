@@ -79,6 +79,7 @@ return {
 		config = function(_, opts)
 			local ctx = require("treesitter-context")
 			ctx.setup(opts)
+			ctx.disable() -- prevent ctx's own cursor-mode autocmds from running
 
 			local visible = false
 
@@ -90,7 +91,7 @@ return {
 				end)
 			end
 
-			-- Only call disable once per movement burst, not on every keypress
+			-- Disable once at the start of movement, then do nothing until idle
 			vim.api.nvim_create_autocmd("CursorMoved", {
 				callback = function()
 					if visible then
@@ -99,14 +100,26 @@ return {
 					end
 				end,
 			})
-			vim.api.nvim_create_autocmd("CursorHold", { callback = refresh })
-			vim.api.nvim_create_autocmd("BufEnter",   { callback = refresh })
+			-- Only refresh if not already showing — CursorHold fires once per idle
+			-- transition but guard against any edge-case double-runs
+			vim.api.nvim_create_autocmd("CursorHold", {
+				callback = function()
+					if not visible then refresh() end
+				end,
+			})
+			-- Always refresh on buffer enter since visible state is per-buffer
+			vim.api.nvim_create_autocmd("BufEnter", {
+				callback = function()
+					visible = false
+					refresh()
+				end,
+			})
 		end,
 	},
 	{
 		"RRethy/vim-illuminate",
 		event = { "BufReadPost", "BufNewFile" },
-		opts = { delay = 500, large_file_cutoff = 2000, providers = { "lsp", "regex" } },
+		opts = { delay = 2000, large_file_cutoff = 2000, providers = { "regex" } },
 		config = function(_, opts)
 			require("illuminate").configure(opts)
 		end,

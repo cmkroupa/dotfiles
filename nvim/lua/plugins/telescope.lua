@@ -8,7 +8,6 @@ return {
 		},
 		config = function()
 			local telescope = require("telescope")
-			local lga_actions = require("telescope-live-grep-args.actions")
 
 			telescope.setup({
 				defaults = {
@@ -24,10 +23,7 @@ return {
 					path_display = { "truncate" },
 				},
 				extensions = {
-					live_grep_args = {
-						auto_quoting = true,
-						mappings = { i = { ["<C-k>"] = lga_actions.quote_prompt() } },
-					},
+					live_grep_args = { auto_quoting = true },
 				},
 			})
 

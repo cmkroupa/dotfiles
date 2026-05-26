@@ -15,6 +15,15 @@ vim.opt.clipboard = "unnamedplus"
 vim.opt.swapfile = false
 vim.opt.undofile = true
 vim.opt.updatetime = 2000
+
+vim.diagnostic.config({
+    update_in_insert = false,
+    virtual_text     = { spacing = 2, prefix = "●" },
+    signs            = true,
+    underline        = true,
+    severity_sort    = true,
+    float            = { border = "rounded", source = true },
+})
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.colorcolumn = "120"

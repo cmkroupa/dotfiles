@@ -1,7 +1,7 @@
 return {
-	{ "numToStr/Comment.nvim", lazy = false, opts = {} },
+	{ "numToStr/Comment.nvim", event = "VeryLazy", opts = {} },
 	{ "windwp/nvim-autopairs", event = "InsertEnter", opts = {} },
-	{ "windwp/nvim-ts-autotag", opts = {} },
+	{ "windwp/nvim-ts-autotag", ft = { "html", "eruby" }, opts = {} },
 	{
 		"folke/flash.nvim",
 		event = "VeryLazy",

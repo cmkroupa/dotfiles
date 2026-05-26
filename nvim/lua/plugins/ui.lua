@@ -24,7 +24,6 @@ return {
 				lsp_trouble       = true,
 				mason             = true,
 				mini              = { enabled = true },
-				navic             = { enabled = true, custom_bg = "NONE" },
 				noice             = true,
 				notify            = true,
 				telescope         = { enabled = true },
@@ -54,12 +53,7 @@ return {
 		opts = {
 			options = {
 				mode = "buffers",
-				diagnostics = "nvim_lsp",
-				diagnostics_indicator = function(_, _, diag)
-					local icons = { error = " ", warning = " " }
-					return (diag.error and icons.error .. diag.error or "")
-						.. (diag.warning and icons.warning .. diag.warning or "")
-				end,
+				diagnostics = false,
 				show_buffer_close_icons = false,
 				show_close_icon = false,
 				separator_style = "thin",
@@ -71,12 +65,10 @@ return {
 		"nvim-lualine/lualine.nvim",
 		lazy = false,
 		priority = 999,
-		dependencies = { "catppuccin/nvim", "SmiteshP/nvim-navic" },
+		dependencies = { "catppuccin/nvim" },
 		config = function()
 			local lualine_theme = "auto"
-			if active_theme == "catppuccin" then
-				lualine_theme = "auto"
-			elseif active_theme == "tokyonight" then
+			if active_theme == "tokyonight" then
 				lualine_theme = "tokyonight"
 			elseif active_theme == "gruvbox" then
 				lualine_theme = "gruvbox"
@@ -94,17 +86,7 @@ return {
 				sections = {
 					lualine_a = { "mode" },
 					lualine_b = { "branch", "diff" },
-					lualine_c = {
-						{ "filename", path = 1 },
-						"diagnostics",
-						{
-							function() return require("nvim-navic").get_location() end,
-							cond = function()
-								return package.loaded["nvim-navic"]
-									and require("nvim-navic").is_available()
-							end,
-						},
-					},
+					lualine_c = { { "filename", path = 1 } },
 					lualine_x = { "filetype" },
 					lualine_y = {},
 					lualine_z = { "location" },
@@ -117,28 +99,13 @@ return {
 		"folke/noice.nvim",
 		dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify" },
 		opts = {
-			lsp = {
-				override = {
-					["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-					["vim.lsp.util.stylize_markdown"] = true,
-				},
-			},
 			presets = {
-				bottom_search        = true,
-				command_palette      = true,
+				bottom_search         = true,
 				long_message_to_split = true,
-				lsp_doc_border       = true,
 			},
 		},
 	},
-	-- indent guides with scope highlight
-	{
-		"lukas-reineke/indent-blankline.nvim",
-		main = "ibl",
-		opts = {
-			scope = { enabled = false },
-		},
-	},
+	{ "lukas-reineke/indent-blankline.nvim", main = "ibl", opts = { enabled = false } },
 	-- git signs in gutter
 	{ "lewis6991/gitsigns.nvim", opts = {} },
 	-- todo/fixme highlights
