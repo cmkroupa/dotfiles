@@ -24,6 +24,39 @@ M.themes = {
   "github_dark",
 }
 
+-- Maps Neovim themes to Ghostty's built-in theme identifiers for seamless sync
+function M.apply_ghostty_theme(theme_name)
+  local map = {
+    ["catppuccin-macchiato"] = "catppuccin-macchiato",
+    ["catppuccin-mocha"] = "catppuccin-mocha",
+    ["catppuccin-latte"] = "catppuccin-latte",
+    ["tokyonight-storm"] = "TokyoNight Storm",
+    ["tokyonight-night"] = "TokyoNight",
+    ["tokyonight-moon"] = "TokyoNight Moon",
+    ["kanagawa-wave"] = "Kanagawa Wave",
+    ["kanagawa-dragon"] = "Kanagawa Dragon",
+    ["gruvbox"] = "GruvboxDark",
+    ["rose-pine"] = "rose-pine",
+    ["rose-pine-moon"] = "rose-pine-moon",
+    ["onedark"] = "OneDark",
+    ["nightfox"] = "nightfox",
+    ["carbonfox"] = "carbonfox",
+    ["everforest"] = "Everforest Dark Hard",
+    ["dracula"] = "Dracula",
+    ["github_dark"] = "GitHub Dark",
+  }
+  local ghostty_theme = map[theme_name] or "TokyoNight"
+  local home = os.getenv("HOME")
+  if home then
+    local ghostty_file = home .. "/.config/ghostty/active_theme"
+    local f = io.open(ghostty_file, "w")
+    if f then
+      f:write("theme = " .. ghostty_theme .. "\n")
+      f:close()
+    end
+  end
+end
+
 -- Reads the active theme from the persistence file
 function M.get_theme()
   local f = io.open(M.theme_file, "r")
@@ -38,19 +71,21 @@ function M.get_theme()
   return M.default_theme
 end
 
--- Saves the active theme to the persistence file
+-- Saves the active theme to the persistence file and syncs Ghostty
 function M.set_theme(theme_name)
   local f = io.open(M.theme_file, "w")
   if f then
     f:write(theme_name)
     f:close()
   end
+  M.apply_ghostty_theme(theme_name)
 end
 
--- Safely applies the configured theme
+-- Safely applies the configured theme to both Neovim and Ghostty
 function M.apply_theme()
   local theme = M.get_theme()
   pcall(vim.cmd.colorscheme, theme)
+  M.apply_ghostty_theme(theme)
 end
 
 -- Open Telescope to dynamically preview and select from the curated 10+ premium themes
@@ -69,6 +104,7 @@ function M.select_theme()
       local selection = action_state.get_selected_entry()
       if selection then
         pcall(vim.cmd.colorscheme, selection[1])
+        M.apply_ghostty_theme(selection[1])
       end
     end
 
@@ -89,6 +125,7 @@ function M.select_theme()
             print("Theme changed to: " .. selection[1])
           else
             pcall(vim.cmd.colorscheme, initial_theme)
+            M.apply_ghostty_theme(initial_theme)
           end
         end)
 
@@ -115,6 +152,7 @@ function M.select_theme()
         local function cancel()
           actions.close(prompt_bufnr)
           pcall(vim.cmd.colorscheme, initial_theme)
+          M.apply_ghostty_theme(initial_theme)
         end
         map("i", "<Esc>", cancel)
         map("n", "<Esc>", cancel)
@@ -133,6 +171,7 @@ function M.select_theme()
         M.apply_theme()
       else
         pcall(vim.cmd.colorscheme, initial_theme)
+        M.apply_ghostty_theme(initial_theme)
       end
     end)
   end
