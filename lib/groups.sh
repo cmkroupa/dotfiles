@@ -8,5 +8,6 @@ declare -A PKG_GROUPS=(
   [starship]="starship"
   [tmux]="tmux"
   [dev]="mise nvim"
+  [gui]="ghostty"
 )
-PKG_GROUP_ORDER=(shell starship tmux dev)
+PKG_GROUP_ORDER=(shell starship tmux dev gui)

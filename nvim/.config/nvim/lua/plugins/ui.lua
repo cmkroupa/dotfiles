@@ -16,9 +16,17 @@ return {
         },
         config = function(_, opts)
             require("catppuccin").setup(opts)
-            vim.cmd.colorscheme("catppuccin")
         end,
     },
+    { "folke/tokyonight.nvim", lazy = false, priority = 1000 },
+    { "rebelot/kanagawa.nvim", lazy = false, priority = 1000 },
+    { "ellisonleao/gruvbox.nvim", lazy = false, priority = 1000 },
+    { "rose-pine/neovim", name = "rose-pine", lazy = false, priority = 1000 },
+    { "navarasu/onedark.nvim", lazy = false, priority = 1000 },
+    { "EdenEast/nightfox.nvim", lazy = false, priority = 1000 },
+    { "sainnhe/everforest", lazy = false, priority = 1000 },
+    { "Mofiqul/dracula.nvim", lazy = false, priority = 1000 },
+    { "projekt0n/github-nvim-theme", lazy = false, priority = 1000 },
     { "akinsho/bufferline.nvim",
         version = "*",
         dependencies = { "nvim-tree/nvim-web-devicons" },

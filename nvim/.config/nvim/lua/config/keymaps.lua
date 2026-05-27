@@ -8,6 +8,7 @@ map({ "n", "v" }, "<leader>p", '"+p', { desc = "Paste from system clipboard" })
 map({ "n", "v" }, "<leader>P", '"+P', { desc = "Paste from system clipboard (before)" })
 map("n", "<leader>l", "<cmd>Lazy<cr>", { desc = "Lazy" })
 map("n", "<leader>d", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics" })
+map("n", "<leader>th", function() require("config.theme").select_theme() end, { desc = "Theme Switcher" })
 
 map("n", "<leader>h", function()
     require("snacks").win({
@@ -22,7 +23,7 @@ map("n", "<leader>h", function()
             "  Surround (gz)                <leader>i  hover info",
             "  gza  add                     [d / ]d  prev/next error",
             "  gzd  delete                  [d / ]d  prev/next error",
-            "  gzr  replace",
+            "  gzr  replace                 <leader>th theme switcher",
             "",
             "  Text Objects                 Treesitter Moves",
             "  af/if  function              ]f / [f  next/prev function",
