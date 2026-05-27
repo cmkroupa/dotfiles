@@ -3,17 +3,36 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-PACKAGES=(shell zsh bash tmux starship nvim mise)
-STOW_OPTS=(--ignore='packages.*\.txt' --ignore='install\.sh')
-BAK_DIR="$(pwd)/.bak"
+source "$(dirname "${BASH_SOURCE[0]}")/lib/groups.sh"
+
+PACKAGES=()
+for g in "${PKG_GROUP_ORDER[@]}"; do
+  read -ra _pkgs <<< "${PKG_GROUPS[$g]}"
+  PACKAGES+=("${_pkgs[@]}")
+done
 
 [[ "$(uname)" == "Darwin" ]] && OS=macOS || OS=$(. /etc/os-release 2>/dev/null && echo "$NAME" || echo unknown)
-command -v brew   &>/dev/null && PM=brew   ||
-command -v apt    &>/dev/null && PM=apt    ||
-command -v pacman &>/dev/null && PM=pacman ||
-command -v dnf    &>/dev/null && PM=dnf    || PM=none
+if   command -v brew   &>/dev/null; then PM=brew
+elif command -v apt    &>/dev/null; then PM=apt
+elif command -v pacman &>/dev/null; then PM=pacman
+elif command -v dnf    &>/dev/null; then PM=dnf
+else PM=none
+fi
 
 echo "OS: $OS  |  PM: $PM"
+
+_conflicts=()
+{ command -v pyenv &>/dev/null || [[ -d "$HOME/.pyenv" ]]; }                                          && _conflicts+=(pyenv)
+{ command -v conda &>/dev/null || [[ -d "$HOME/miniconda3" ]] || [[ -d "$HOME/anaconda3" ]]; }        && _conflicts+=(conda)
+{ [[ -d "$HOME/.nvm" ]] || [[ -n "${NVM_DIR:-}" ]]; }                                                 && _conflicts+=(nvm)
+{ command -v asdf &>/dev/null || [[ -d "$HOME/.asdf" ]]; }                                            && _conflicts+=(asdf)
+{ command -v rbenv &>/dev/null || [[ -d "$HOME/.rbenv" ]]; }                                          && _conflicts+=(rbenv)
+{ command -v rvm &>/dev/null || [[ -d "$HOME/.rvm" ]]; }                                              && _conflicts+=(rvm)
+if [[ ${#_conflicts[@]} -gt 0 ]]; then
+  echo "Error: conflicting runtime managers detected: ${_conflicts[*]}"
+  echo "  Remove them before installing, or activate tools in ~/.config/mise/config.toml instead."
+  exit 1
+fi
 
 if ! command -v stow &>/dev/null; then
   case "$PM" in
@@ -23,8 +42,6 @@ if ! command -v stow &>/dev/null; then
   esac
   echo "Error: stow required — $cmd"; exit 1
 fi
-
-[[ -d "$BAK_DIR" ]] && { echo "Error: .bak/ exists — run ./unlink.sh first"; exit 1; }
 
 pkgs=()
 for pkg in "${PACKAGES[@]}"; do
@@ -49,16 +66,11 @@ for pkg in "${PACKAGES[@]}"; do
   [[ -f "$pkg/install.sh" ]] && bash "$pkg/install.sh"
 done
 
-for pkg in "${PACKAGES[@]}"; do
-  conflicts=$(stow --simulate --target="$HOME" "${STOW_OPTS[@]}" "$pkg" 2>&1 \
-    | grep -E "existing target is (not owned by stow|neither a link nor a directory)" || true)
-  while IFS= read -r line; do
-    target=$(echo "$line" | sed -E 's/.*existing target is (not owned by stow|neither a link nor a directory): //')
-    [[ -z "$target" ]] && continue
-    mkdir -p "$(dirname "$BAK_DIR/$target")"
-    mv "$HOME/$target" "$BAK_DIR/$target" && echo "  backed up: ~/$target"
-  done <<< "$conflicts"
-  stow --target="$HOME" "${STOW_OPTS[@]}" "$pkg" && echo "  stowed: $pkg"
-done
+bash "$(dirname "${BASH_SOURCE[0]}")/lib/link.sh"
 
-echo "Done. Run: source ~/.zshrc"
+case "$SHELL" in
+  */zsh)  rc=~/.zshrc ;;
+  */bash) rc=~/.bashrc ;;
+  *)      rc="your shell's rc file" ;;
+esac
+echo "Done. Run: source $rc"

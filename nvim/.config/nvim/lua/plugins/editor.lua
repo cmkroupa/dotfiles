@@ -28,7 +28,6 @@ return {
 			auto_install = true,
 			highlight = { enable = true },
 			indent    = { enable = false },
-			matchup   = { enable = false },
 			textobjects = {
 				select = {
 					enable    = true,
@@ -73,64 +72,5 @@ return {
 			)
 		end,
 	},
-	{
-		"nvim-treesitter/nvim-treesitter-context",
-		opts = { max_lines = 3 },
-		config = function(_, opts)
-			local ctx = require("treesitter-context")
-			ctx.setup(opts)
-			ctx.disable() -- prevent ctx's own cursor-mode autocmds from running
-
-			local visible = false
-
-			local function refresh()
-				ctx.disable()
-				vim.schedule(function()
-					ctx.enable()
-					visible = true
-				end)
-			end
-
-			-- Disable once at the start of movement, then do nothing until idle
-			vim.api.nvim_create_autocmd("CursorMoved", {
-				callback = function()
-					if visible then
-						ctx.disable()
-						visible = false
-					end
-				end,
-			})
-			-- Only refresh if not already showing — CursorHold fires once per idle
-			-- transition but guard against any edge-case double-runs
-			vim.api.nvim_create_autocmd("CursorHold", {
-				callback = function()
-					if not visible then refresh() end
-				end,
-			})
-			-- Always refresh on buffer enter since visible state is per-buffer
-			vim.api.nvim_create_autocmd("BufEnter", {
-				callback = function()
-					visible = false
-					refresh()
-				end,
-			})
-		end,
-	},
-	{
-		"RRethy/vim-illuminate",
-		event = { "BufReadPost", "BufNewFile" },
-		opts = { delay = 2000, large_file_cutoff = 2000, providers = { "regex" } },
-		config = function(_, opts)
-			require("illuminate").configure(opts)
-		end,
-	},
 	{ "j-hui/fidget.nvim", opts = {} },
-	{
-		"andymass/vim-matchup",
-		init = function()
-			vim.g.matchup_matchparen_deferred       = 1
-			vim.g.matchup_matchparen_offscreen      = { method = "status" }
-			vim.g.matchup_treesitter_enabled        = 0
-		end,
-	},
 }

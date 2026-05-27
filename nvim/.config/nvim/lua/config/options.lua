@@ -11,10 +11,10 @@ vim.opt.cursorline = true
 vim.opt.scrolloff = 8
 vim.opt.splitbelow = true
 vim.opt.splitright = true
-vim.opt.clipboard = "unnamedplus"
 vim.opt.swapfile = false
 vim.opt.undofile = true
-vim.opt.updatetime = 2000
+vim.opt.updatetime = 250
+vim.opt.timeoutlen = 300
 
 vim.diagnostic.config({
     update_in_insert = false,
@@ -24,20 +24,11 @@ vim.diagnostic.config({
     severity_sort    = true,
     float            = { border = "rounded", source = true },
 })
+vim.cmd("runtime macros/matchit.vim")
+
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.colorcolumn = "120"
-
-vim.api.nvim_create_autocmd("BufWritePre", {
-    pattern = "*",
-    callback = function()
-        local pos = vim.api.nvim_win_get_cursor(0)
-        vim.cmd([[%s/\s\+$//e]])
-        local line_count = vim.api.nvim_buf_line_count(0)
-        pos[1] = math.min(pos[1], line_count)
-        vim.api.nvim_win_set_cursor(0, pos)
-    end,
-})
 
 
 if vim.fn.has("wsl") == 1 then

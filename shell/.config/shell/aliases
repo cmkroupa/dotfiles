@@ -1,8 +1,16 @@
 alias ..='cd ..'
 alias ...='cd ../..'
-alias ls='eza --icons --group-directories-first'
-alias ll='eza -la --icons --group-directories-first --git'
-alias cat='bat --paging=never'
+command -v eza &>/dev/null && alias ls='eza --icons --group-directories-first'
+command -v eza &>/dev/null && alias ll='eza -la --icons --group-directories-first --git'
+cat() {
+  if [[ $# -eq 1 && "$1" == *.md ]] && command -v glow &>/dev/null; then
+    glow "$1"
+  elif command -v bat &>/dev/null; then
+    bat --paging=never "$@"
+  else
+    command cat "$@"
+  fi
+}
 alias v='nvim'
 alias g='git'
 alias gst='git status'

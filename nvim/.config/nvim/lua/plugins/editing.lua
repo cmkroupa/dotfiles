@@ -1,4 +1,13 @@
 return {
+    { "echasnovski/mini.trailspace",
+        event = "BufWritePre",
+        config = function()
+            require("mini.trailspace").setup()
+            vim.api.nvim_create_autocmd("BufWritePre", {
+                callback = function() MiniTrailspace.trim() end,
+            })
+        end,
+    },
     { "numToStr/Comment.nvim",  event = "InsertEnter", opts = {} },
     { "windwp/nvim-autopairs",  event = "InsertEnter", opts = {} },
     { "windwp/nvim-ts-autotag", ft = { "html", "eruby" }, opts = {} },

@@ -36,4 +36,4 @@ command -v zoxide  &>/dev/null && eval "$(zoxide init zsh --cmd cd)"
 command -v starship &>/dev/null && eval "$(starship init zsh)"
 
 # ── Aliases ───────────────────────────────────────────────────────────────────
-source ~/.config/shell/aliases
+[[ -f ~/.config/shell/aliases ]] && source ~/.config/shell/aliases
