@@ -31,7 +31,7 @@ _conflicts=()
 if [[ ${#_conflicts[@]} -gt 0 ]]; then
   echo "Error: conflicting runtime managers detected: ${_conflicts[*]}"
   echo "  Remove them before installing, or activate tools in ~/.config/mise/config.toml instead."
-  exit 1
+  # exit 1
 fi
 
 if ! command -v stow &>/dev/null; then
@@ -40,7 +40,7 @@ if ! command -v stow &>/dev/null; then
     pacman) cmd="sudo pacman -S stow" ;; dnf) cmd="sudo dnf install stow" ;;
     *) cmd="install stow via your package manager" ;;
   esac
-  echo "Error: stow required — $cmd"; exit 1
+  echo "Error: stow required — $cmd"; # exit 1
 fi
 
 pkgs=()

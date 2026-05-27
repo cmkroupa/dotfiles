@@ -2,7 +2,7 @@ alias ..='cd ..'
 alias ...='cd ../..'
 command -v eza &>/dev/null && alias ls='eza --icons --group-directories-first'
 command -v eza &>/dev/null && alias ll='eza -la --icons --group-directories-first --git'
-cat() {
+function cat() {
   if [[ $# -eq 1 && "$1" == *.md ]] && command -v glow &>/dev/null; then
     glow "$1"
   elif command -v bat &>/dev/null; then
@@ -20,13 +20,13 @@ alias gsw='git switch'
 alias rg='rg --smart-case'
 alias path='echo $PATH | tr ":" "\n"'
 
-glg() { git log --oneline --graph --decorate -${1:-20}; }
-mkcd() { mkdir -p "$1" && cd "$1"; }
-reload() {
+function glg() { git log --oneline --graph --decorate -${1:-20}; }
+function mkcd() { mkdir -p "$1" && cd "$1"; }
+function reload() {
   [[ -n "$ZSH_VERSION" ]]  && source ~/.zshrc  && return
   [[ -n "$BASH_VERSION" ]] && source ~/.bashrc && return
 }
-lspinit() {
+function lspinit() {
   command -v compiledb &>/dev/null && command -v jq &>/dev/null || { echo "requires compiledb and jq"; return 1; }
   local root; root=$(git -C "${1:-.}" rev-parse --show-toplevel 2>/dev/null) || root="${1:-.}"
   local tmp_files=()

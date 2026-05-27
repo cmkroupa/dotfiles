@@ -23,7 +23,7 @@ return {
 			ensure_installed = {
 				"python", "rust", "c", "cpp", "ruby", "lua", "vim", "vimdoc",
 				"go", "html", "css", "javascript", "typescript", "json", "yaml",
-				"bash", "toml", "markdown", "markdown_inline",
+				"bash", "toml", "markdown", "markdown_inline", "make",
 			},
 			auto_install = true,
 			highlight = { enable = true },
