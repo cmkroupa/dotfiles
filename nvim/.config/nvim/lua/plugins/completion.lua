@@ -11,20 +11,19 @@ return {
 		version = "*",
 		dependencies = { "L3MON4D3/LuaSnip" },
 		opts = {
-			keymap = { preset = "default" },
+			keymap = {
+				preset = "default",
+				["<Tab>"] = { "accept", "fallback" },
+			},
 			appearance = {},
 			sources = {
 				default = { "lsp", "path", "snippets", "buffer" },
 			},
 			completion = {
-				documentation = { auto_show = false },
-				trigger = {
-					show_on_keyword                     = false,
-					show_on_trigger_character           = false,
-					show_on_insert_on_trigger_character = false,
-					show_on_accept_on_trigger_character = false,
-				},
+				documentation = { auto_show = true, auto_show_delay_ms = 500 },
+				menu = { auto_show_delay_ms = 1000 },
 			},
+			signature = { enabled = true },
 			snippets = {
 				expand = function(snippet)
 					require("luasnip").lsp_expand(snippet)

@@ -6,14 +6,16 @@ return {
                 rust   = { "rustfmt" },
                 go     = { "gofmt" },
                 lua    = { "stylua" },
+                php    = { "pint" },
+                blade  = { "blade_formatter" },
             },
             formatters = {
                 stylua = { prepend_args = { "--indent-type", "Spaces", "--indent-width", "4" } },
             },
             format_on_save = function(bufnr)
                 local ft = vim.bo[bufnr].filetype
-                if ft == "c" or ft == "cpp" or ft == "ruby" then return nil end
-                return { timeout_ms = 5000, lsp_fallback = true }
+                if ft == "c" or ft == "cpp" then return nil end
+                return { timeout_ms = 5000, lsp_format = "fallback" }
             end,
         },
     },

@@ -1,5 +1,3 @@
 [tools]
-# node    = "lts"
-# python  = "latest"
-# go      = "latest"
-# rust    = "latest"
+python = "latest"
+# tmux managed by system (mise shims break on WSL with no tty)

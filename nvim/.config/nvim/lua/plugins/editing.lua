@@ -8,7 +8,16 @@ return {
             })
         end,
     },
-    { "numToStr/Comment.nvim",  event = "InsertEnter", opts = {} },
+    { "numToStr/Comment.nvim",
+        event = "VeryLazy",
+        opts = { mappings = { basic = false, extra = false } },
+        keys = {
+            { "<leader>tc", function() require("Comment.api").toggle.linewise.current() end,
+              mode = "n", desc = "Toggle Comment" },
+            { "<leader>tc", "<Plug>(comment_toggle_linewise_visual)",
+              mode = "x", desc = "Toggle Comment" },
+        },
+    },
     { "windwp/nvim-autopairs",  event = "InsertEnter", opts = {} },
     { "windwp/nvim-ts-autotag", ft = { "html", "eruby" }, opts = {} },
     {

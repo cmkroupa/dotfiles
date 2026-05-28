@@ -3,9 +3,9 @@ return {
 		"echasnovski/mini.surround",
 		opts = {
 			mappings = {
-				add            = "gza",
-				delete         = "gzd",
-				replace        = "gzr",
+				add            = "ys",
+				delete         = "ds",
+				replace        = "cs",
 				find           = "gzf",
 				find_left      = "gzF",
 				highlight      = "gzh",
@@ -21,7 +21,7 @@ return {
 		dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
 		opts = {
 			ensure_installed = {
-				"python", "rust", "c", "cpp", "ruby", "lua", "vim", "vimdoc",
+				"python", "rust", "c", "cpp", "php", "lua", "vim", "vimdoc",
 				"go", "html", "css", "javascript", "typescript", "json", "yaml",
 				"bash", "toml", "markdown", "markdown_inline", "make",
 			},
@@ -46,11 +46,11 @@ return {
 					set_jumps = true,
 					goto_next_start = {
 						["]f"] = { query = "@function.outer", desc = "Next function" },
-						["]t"] = { query = "@class.outer",    desc = "Next class" },
+						["]c"] = { query = "@class.outer",    desc = "Next class" },
 					},
 					goto_previous_start = {
 						["[f"] = { query = "@function.outer", desc = "Prev function" },
-						["[t"] = { query = "@class.outer",    desc = "Prev class" },
+						["[c"] = { query = "@class.outer",    desc = "Prev class" },
 					},
 				},
 			},

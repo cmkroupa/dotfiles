@@ -1,3 +1,4 @@
+alias godot='cd ~/dotfiles'
 alias ..='cd ..'
 alias ...='cd ../..'
 command -v eza &>/dev/null && alias ls='eza --icons --group-directories-first'
@@ -25,6 +26,21 @@ function mkcd() { mkdir -p "$1" && cd "$1"; }
 function reload() {
   [[ -n "$ZSH_VERSION" ]]  && source ~/.zshrc  && return
   [[ -n "$BASH_VERSION" ]] && source ~/.bashrc && return
+}
+alias ccgen='python3 tests/clang/compile_commands_factory.py core compile_commands.json && ln -sf "$(pwd)/compile_commands.json" ~/dotfiles/compile_commands.json'
+uncrust() {
+  [[ $# -eq 0 ]] && { echo "usage: uncrust <file>"; return 1; }
+  local cfg="${XDG_CONFIG_HOME:-$HOME/.config}/uncrustify/core-uncrustify.cfg"
+  [[ -f "$cfg" ]] || { echo "uncrust: config not found: $cfg"; return 1; }
+  for f in "$@"; do
+    local ext="${f##*.}"
+    case "$ext" in
+      c|h)             local lang=C ;;
+      cpp|hpp|tcc|ipp) local lang=CPP ;;
+      *) echo "uncrust: unsupported extension: $f"; continue ;;
+    esac
+    uncrustify -c "$cfg" -l "$lang" --no-backup "$f" && echo "formatted: $f"
+  done
 }
 function lspinit() {
   command -v compiledb &>/dev/null && command -v jq &>/dev/null || { echo "requires compiledb and jq"; return 1; }
