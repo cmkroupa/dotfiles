@@ -27,6 +27,7 @@ function reload() {
   [[ -n "$ZSH_VERSION" ]]  && source ~/.zshrc  && return
   [[ -n "$BASH_VERSION" ]] && source ~/.bashrc && return
 }
+alias ccgen='python3 tests/clang/compile_commands_factory.py core compile_commands.json && ln -sf "$(pwd)/compile_commands.json" ~/dotfiles/compile_commands.json'
 uncrust() {
   [[ $# -eq 0 ]] && { echo "usage: uncrust <file>"; return 1; }
   local root; root=$(git rev-parse --show-toplevel 2>/dev/null)
