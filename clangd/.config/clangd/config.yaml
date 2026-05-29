@@ -6,7 +6,8 @@ Diagnostics:
 If:
   PathMatch: .*\.c$
 CompileFlags:
-  Add: [-x, c]
+  Remove: [-std=.*]
+  Add: [-x, c, -std=c11]
 
 ---
 If:
