@@ -1,3 +1,10 @@
 Diagnostics:
   Suppress:
     - builtin_definition
+
+---
+If:
+  PathMatch: .*\.c$
+CompileFlags:
+  Remove: [-std=c++*]
+  Add: [-x, c]
