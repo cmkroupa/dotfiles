@@ -27,7 +27,6 @@ function reload() {
   [[ -n "$ZSH_VERSION" ]]  && source ~/.zshrc  && return
   [[ -n "$BASH_VERSION" ]] && source ~/.bashrc && return
 }
-alias ccgen='python3 tests/clang/compile_commands_factory.py core compile_commands.json && ln -sf "$(pwd)/compile_commands.json" ~/dotfiles/compile_commands.json'
 uncrust() {
   [[ $# -eq 0 ]] && { echo "usage: uncrust <file>"; return 1; }
   local cfg="${XDG_CONFIG_HOME:-$HOME/.config}/uncrustify/core-uncrustify.cfg"
@@ -41,18 +40,4 @@ uncrust() {
     esac
     uncrustify -c "$cfg" -l "$lang" --no-backup "$f" && echo "formatted: $f"
   done
-}
-function lspinit() {
-  command -v compiledb &>/dev/null && command -v jq &>/dev/null || { echo "requires compiledb and jq"; return 1; }
-  local root; root=$(git -C "${1:-.}" rev-parse --show-toplevel 2>/dev/null) || root="${1:-.}"
-  local tmp_files=()
-  while IFS= read -r dir; do
-    local tmp; tmp=$(mktemp /tmp/ccXXXXXX.json)
-    (cd "$dir" && compiledb -f -o "$tmp" make -n -k 2>/dev/null) && [[ -s "$tmp" ]] \
-      && tmp_files+=("$tmp") || rm -f "$tmp"
-  done < <(find "$root" -maxdepth 2 -name "[Mm]akefile" -not -path "*/build/*" -printf "%h\n" | sort -u)
-  [[ ${#tmp_files[@]} -eq 0 ]] && { echo "no compile_commands.json generated"; return 1; }
-  jq -s 'add | unique_by(.file)' "${tmp_files[@]}" > "$root/compile_commands.json"
-  rm -f "${tmp_files[@]}"
-  echo "written to $root/compile_commands.json"
 }

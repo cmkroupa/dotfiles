@@ -13,7 +13,7 @@ return {
     { "neovim/nvim-lspconfig",
         dependencies = { "williamboman/mason-lspconfig.nvim" },
         config = function()
-            vim.lsp.config("emmet_ls", { filetypes = { "html", "css", "scss", "blade" } })
+            vim.lsp.config("emmet_ls", { filetypes = { "html", "css", "scss" } })
             vim.lsp.config("clangd", {
                 root_markers = { "compile_commands.json" },
                 cmd = { "clangd", "--background-index", "--fallback-style=none" },

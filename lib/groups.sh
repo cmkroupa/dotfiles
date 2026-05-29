@@ -7,7 +7,7 @@ declare -A PKG_GROUPS=(
   [shell]="shell zsh bash"
   [starship]="starship"
   [tmux]="tmux"
-  [dev]="mise nvim"
+  [dev]="mise nvim clangd uncrustify"
   [gui]="ghostty"
   [ruby]="ruby"
 )
