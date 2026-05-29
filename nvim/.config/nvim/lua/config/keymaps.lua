@@ -11,7 +11,7 @@ map("n", "<leader>d", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnosti
 map("n", "<leader>th", function() require("config.theme").select_theme() end, { desc = "Theme Switcher" })
 
 local _hl_ids = {}
-map("v", "<leader>H", function()
+map("v", "<leader>h", function()
     local s = vim.fn.getpos("v")
     local e = vim.fn.getpos(".")
     local sr, sc, er, ec = s[2], s[3], e[2], e[3]
@@ -30,12 +30,12 @@ map("v", "<leader>H", function()
     end
     vim.fn.feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "nx")
 end, { desc = "Pin highlight" })
-map("n", "<leader>H", function()
+map("n", "<leader>h", function()
     for _, id in ipairs(_hl_ids) do pcall(vim.fn.matchdelete, id) end
     _hl_ids = {}
 end, { desc = "Clear pinned highlights" })
 
-map("n", "<leader>h", function()
+map("n", "<leader>?", function()
     require("snacks").win({
         text = {
             "  Flash                        LSP Navigation",
@@ -49,7 +49,7 @@ map("n", "<leader>h", function()
             "  gza  add                     [d / ]d     prev/next error",
             "  gzd  delete                  <leader>ti  inlay hints",
             "  gzr  replace                 <leader>th  theme switcher",
-            "                               <leader>H   pin/clear highlight",
+            "                               <leader>h   pin/clear highlight",
             "",
             "  Text Objects                 Treesitter Moves",
             "  af/if  function              ]f / [f  next/prev function",
@@ -61,6 +61,6 @@ map("n", "<leader>h", function()
         width = 62,
         height = 17,
         style = "minimal",
-        keys = { q = "close", ["<Esc>"] = "close" },
+        keys = { q = "close", ["<Esc>"] = "close", ["?"] = "close" },
     })
 end, { desc = "Key Reference" })

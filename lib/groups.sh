@@ -7,8 +7,7 @@ declare -A PKG_GROUPS=(
   [shell]="shell zsh bash"
   [starship]="starship"
   [tmux]="tmux"
-  [dev]="mise nvim clangd uncrustify"
+  [dev]="mise nvim clangd uncrustify ruby"
   [gui]="ghostty"
-  [ruby]="ruby"
 )
-PKG_GROUP_ORDER=(shell starship tmux dev gui ruby)
+PKG_GROUP_ORDER=(shell starship tmux dev gui)
