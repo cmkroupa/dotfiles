@@ -29,6 +29,7 @@ return {
             })
 
             vim.lsp.enable(servers.mason_lsp)
+            vim.lsp.enable(servers.gem_lsp)
 
             vim.api.nvim_create_autocmd("LspAttach", {
                 callback = function(args)
