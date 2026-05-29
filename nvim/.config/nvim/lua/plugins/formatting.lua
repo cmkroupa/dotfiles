@@ -6,8 +6,7 @@ return {
                 rust   = { "rustfmt" },
                 go     = { "gofmt" },
                 lua    = { "stylua" },
-                php    = { "pint" },
-                blade  = { "blade_formatter" },
+                ruby   = { "rubocop" },
             },
             formatters = {
                 stylua = { prepend_args = { "--indent-type", "Spaces", "--indent-width", "4" } },
