@@ -29,8 +29,10 @@ function reload() {
 }
 uncrust() {
   [[ $# -eq 0 ]] && { echo "usage: uncrust <file>"; return 1; }
-  local cfg="${XDG_CONFIG_HOME:-$HOME/.config}/uncrustify/core-uncrustify.cfg"
-  [[ -f "$cfg" ]] || { echo "uncrust: config not found: $cfg"; return 1; }
+  local root; root=$(git rev-parse --show-toplevel 2>/dev/null)
+  local cfg="${root:+$root/tests/uncrustify/core-uncrustify.cfg}"
+  [[ -f "$cfg" ]] || cfg="${XDG_CONFIG_HOME:-$HOME/.config}/uncrustify/core-uncrustify.cfg"
+  [[ -f "$cfg" ]] || { echo "uncrust: config not found"; return 1; }
   for f in "$@"; do
     local ext="${f##*.}"
     case "$ext" in

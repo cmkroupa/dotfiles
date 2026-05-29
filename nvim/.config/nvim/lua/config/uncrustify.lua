@@ -12,25 +12,11 @@ local function find_config()
     return nil
 end
 
-local function count_edge_blanks(lines)
-    local leading = 0
-    for _, l in ipairs(lines) do
-        if l == "" then leading = leading + 1 else break end
-    end
-    local trailing = 0
-    for i = #lines, 1, -1 do
-        if lines[i] == "" then trailing = trailing + 1 else break end
-    end
-    return leading, trailing
-end
-
 local function run(lines, lang, cfg, frag)
-    local leading, trailing = count_edge_blanks(lines)
-
     local tmp_in  = os.tmpname()
     local tmp_out = os.tmpname()
     local f = io.open(tmp_in, "w")
-    f:write(table.concat(lines, "\n"))
+    f:write(table.concat(lines, "\n") .. "\n")
     f:close()
 
     local cmd = "uncrustify -c " .. vim.fn.shellescape(cfg)
@@ -58,10 +44,6 @@ local function run(lines, lang, cfg, frag)
     for line in out_f:lines() do result[#result + 1] = line end
     out_f:close()
     os.remove(tmp_out)
-
-    for i = 1, leading do table.insert(result, i, "") end
-    for _ = 1, trailing do result[#result + 1] = "" end
-
     return result
 end
 
