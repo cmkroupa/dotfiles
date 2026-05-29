@@ -1,0 +1,11 @@
+Layout/IndentationWidth:
+  Width: 4
+
+Layout/IndentationConsistency:
+  EnforcedStyle: indented
+
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: variable
+
+Layout/ElseAlignment:
+  Enabled: true
