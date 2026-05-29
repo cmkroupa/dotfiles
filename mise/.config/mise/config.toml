@@ -1,3 +1,4 @@
 [tools]
 python = "latest"
+ruby   = "latest"
 # tmux managed by system (mise shims break on WSL with no tty)
