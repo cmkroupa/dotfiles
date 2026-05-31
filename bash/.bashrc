@@ -25,6 +25,9 @@ command -v mise &>/dev/null && eval "$(mise activate bash)" || {
   [[ -d "$HOME/.local/share/mise/shims" ]] && export PATH="$HOME/.local/share/mise/shims:$PATH"
 }
 
+# Zoxide
+command -v zoxide &>/dev/null && eval "$(zoxide init bash --cmd cd)"
+
 # Starship Prompt
 command -v starship &>/dev/null && eval "$(starship init bash)"
 

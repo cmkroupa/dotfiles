@@ -1,1 +1,1 @@
-require("config.uncrustify").setup("CPP")
+require("config.clang_format").setup()

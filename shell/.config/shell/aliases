@@ -30,17 +30,16 @@ function reload() {
 alias ccgen='python3 tests/clang/compile_commands_factory.py core compile_commands.json && ln -sf "$(pwd)/compile_commands.json" ~/dotfiles/compile_commands.json'
 uncrust() {
   [[ $# -eq 0 ]] && { echo "usage: uncrust <file>"; return 1; }
+  command -v clang-format &>/dev/null || { echo "uncrust: clang-format not found"; return 1; }
   local root; root=$(git rev-parse --show-toplevel 2>/dev/null)
-  local cfg="${root:+$root/tests/uncrustify/core-uncrustify.cfg}"
-  [[ -f "$cfg" ]] || cfg="${XDG_CONFIG_HOME:-$HOME/.config}/uncrustify/core-uncrustify.cfg"
-  [[ -f "$cfg" ]] || { echo "uncrust: config not found"; return 1; }
+  local style="file"
+  [[ -n "$root" && -f "$root/tools/git_hooks/.clang-format" ]] && style="file:$root/tools/git_hooks/.clang-format"
   for f in "$@"; do
     local ext="${f##*.}"
     case "$ext" in
-      c|h)             local lang=C ;;
-      cpp|hpp|tcc|ipp) local lang=CPP ;;
+      c|h|cpp|hpp|tcc|ipp) ;;
       *) echo "uncrust: unsupported extension: $f"; continue ;;
     esac
-    uncrustify -c "$cfg" -l "$lang" --no-backup "$f" && echo "formatted: $f"
+    clang-format -i --style="$style" "$f" && echo "formatted: $f"
   done
 }

@@ -1,1 +1,1 @@
-require("config.uncrustify").setup("C")
+require("config.clang_format").setup()

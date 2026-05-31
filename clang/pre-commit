@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# pre-commit hook
+# Runs: merge conflict check, clang-format (modified lines only)
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+FAILED=0
+
+# =============================================================================
+# 1. MERGE CONFLICT CHECK
+# =============================================================================
+bash "$SCRIPT_DIR/merge_check.sh"
+if [ $? -ne 0 ]; then
+    FAILED=1
+fi
+
+# =============================================================================
+# 2. CLANG-FORMAT (modified lines only)
+# =============================================================================
+bash "$SCRIPT_DIR/clang-format.sh"
+if [ $? -ne 0 ]; then
+    FAILED=1
+fi
+
+# =============================================================================
+# RESULT
+# =============================================================================
+if [ $FAILED -ne 0 ]; then
+    echo "Commit blocked — fix the errors above and try again."
+    exit 1
+fi
+
+exit 0
