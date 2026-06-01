@@ -28,7 +28,7 @@ vim.cmd("runtime macros/matchit.vim")
 
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
-vim.opt.colorcolumn = "120"
+vim.opt.colorcolumn = "80"
 
 
 if vim.fn.has("wsl") == 1 then
