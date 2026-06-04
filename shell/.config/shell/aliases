@@ -20,6 +20,7 @@ alias gph='git push'
 alias gsw='git switch'
 alias rg='rg --smart-case'
 alias path='echo $PATH | tr ":" "\n"'
+alias aliases='command bat --language=bash --style=plain --paging=never ~/.config/shell/aliases 2>/dev/null || command cat ~/.config/shell/aliases'
 
 function glg() { git log --oneline --graph --decorate -${1:-20}; }
 function mkcd() { mkdir -p "$1" && cd "$1"; }

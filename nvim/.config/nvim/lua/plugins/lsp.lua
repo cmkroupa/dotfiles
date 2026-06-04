@@ -39,6 +39,10 @@ return {
 
                     vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
 
+                    for _, k in ipairs({ "grn", "gra", "grr", "gri" }) do
+                        pcall(vim.keymap.del, "n", k, { buffer = args.buf })
+                    end
+
                     map("n", "gd", function() require("telescope.builtin").lsp_definitions()    end, ext("Go to Definition"))
                     map("n", "gD", vim.lsp.buf.declaration,                                          ext("Go to Declaration"))
                     map("n", "gi", function() require("telescope.builtin").lsp_implementations() end, ext("Go to Implementation"))

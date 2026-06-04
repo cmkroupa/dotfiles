@@ -61,7 +61,6 @@ return {
             },
         },
     },
-    { "lewis6991/gitsigns.nvim", opts = {} },
     { "rcarriga/nvim-notify",
         lazy = false,
         opts = {
@@ -84,8 +83,6 @@ return {
                 { "<leader>d", group = "Diagnostics" },
                 { "<leader>i", group = "Info" },
                 { "<leader>t", group = "Toggle" },
-                { "<leader>l", group = "Lazy" },
-                { "<leader>g", icon = { icon = "󰊢", color = "red" } },
                 { "<leader>Y", hidden = true },
                 { "<leader>P", hidden = true },
                 { "gz", group = "Surround" },

@@ -4,10 +4,8 @@
 (( BASH_VERSINFO[0] >= 4 )) || { echo "Error: bash 4+ required (current: $BASH_VERSION)" >&2; exit 1; }
 
 declare -A PKG_GROUPS=(
-  [shell]="shell zsh bash"
-  [starship]="starship"
-  [tmux]="tmux"
-  [dev]="mise nvim clangd uncrustify ruby"
+  [terminal]="shell zsh bash starship tmux"
+  [nvim]="mise nvim uncrustify ruby"
   [gui]="ghostty"
 )
-PKG_GROUP_ORDER=(shell starship tmux dev gui)
+PKG_GROUP_ORDER=(terminal nvim gui)
