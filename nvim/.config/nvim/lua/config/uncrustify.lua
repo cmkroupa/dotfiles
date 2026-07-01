@@ -1,7 +1,7 @@
 local M = {}
 
 local function find_config()
-    return vim.fn.expand("~/dotfiles/uncrustify/uncrustify.cfg")
+    return vim.fn.expand("~/.config/uncrustify/uncrustify.cfg")
 end
 
 local function run(lines, cfg)
