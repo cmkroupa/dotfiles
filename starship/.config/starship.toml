@@ -1,33 +1,47 @@
-format = "$directory${custom.git_dirty}${custom.git_ahead}${custom.git_clean}$character"
+format = "$username$hostname $directory${custom.git_dirty}${custom.git_ahead}${custom.git_clean} $character"
 add_newline = false
 command_timeout = 2000
+
+[username]
+show_always = true
+format = "[$user]($style)"
+style_user = "bold green"
+style_root = "bold red"
+
+[hostname]
+ssh_only = false
+format = "[@$hostname]($style)"
+style = "bold green"
 
 [directory]
 style = "bold blue"
 truncation_length = 4
-truncate_to_repo = true
+truncate_to_repo = false
+format = "[$path]($style)[$read_only]($read_only_style)"
 
 [custom.git_dirty]
 command = "git branch --show-current"
-when = 'git status --no-optional-locks --porcelain 2>/dev/null | grep -q .'
+when = 'git rev-parse --is-inside-work-tree &>/dev/null && git status --no-optional-locks --porcelain 2>/dev/null | grep -q .'
 ignore_timeout = true
 style = "bold red"
-format = "[ $output]($style) "
+format = "[ $output]($style)"
 
 [custom.git_ahead]
 command = "git branch --show-current"
-when = 'test -z "$(git status --no-optional-locks --porcelain 2>/dev/null)" && git rev-list "@{upstream}..HEAD" 2>/dev/null | grep -q .'
+when = 'git rev-parse --is-inside-work-tree &>/dev/null && git rev-list "@{upstream}..HEAD" 2>/dev/null | grep -q .'
 ignore_timeout = true
 style = "bold yellow"
-format = "[ $output]($style) "
+format = "[ $output]($style)"
 
 [custom.git_clean]
 command = "git branch --show-current"
-when = 'test -z "$(git status --no-optional-locks --porcelain 2>/dev/null)" && ! git rev-list "@{upstream}..HEAD" 2>/dev/null | grep -q .'
+when = 'git rev-parse --is-inside-work-tree &>/dev/null && ! git status --no-optional-locks --porcelain 2>/dev/null | grep -q . && ! git rev-list "@{upstream}..HEAD" 2>/dev/null | grep -q .'
 ignore_timeout = true
 style = "bold green"
-format = "[ $output]($style) "
+format = "[ $output]($style)"
 
 [character]
 success_symbol = "[❯](bold green)"
 error_symbol = "[❯](bold red)"
+
+
