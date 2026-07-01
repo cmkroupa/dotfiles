@@ -84,7 +84,7 @@ end
 -- Safely applies the configured theme to both Neovim and Ghostty
 function M.apply_theme()
   local theme = M.get_theme()
-  pcall(vim.cmd.colorscheme, theme)
+  pcall(vim.cmd, "colorscheme " .. theme)
   M.apply_ghostty_theme(theme)
 end
 
@@ -103,7 +103,7 @@ function M.select_theme()
     local function preview_theme()
       local selection = action_state.get_selected_entry()
       if selection then
-        pcall(vim.cmd.colorscheme, selection[1])
+        pcall(vim.cmd, "colorscheme " .. selection[1])
         M.apply_ghostty_theme(selection[1])
       end
     end
@@ -124,7 +124,7 @@ function M.select_theme()
             M.apply_theme()
             print("Theme changed to: " .. selection[1])
           else
-            pcall(vim.cmd.colorscheme, initial_theme)
+            pcall(vim.cmd, "colorscheme " .. initial_theme)
             M.apply_ghostty_theme(initial_theme)
           end
         end)
@@ -151,7 +151,7 @@ function M.select_theme()
         -- Press Esc / C-c to abort and restore original theme
         local function cancel()
           actions.close(prompt_bufnr)
-          pcall(vim.cmd.colorscheme, initial_theme)
+          pcall(vim.cmd, "colorscheme " .. initial_theme)
           M.apply_ghostty_theme(initial_theme)
         end
         map("i", "<Esc>", cancel)
@@ -170,7 +170,7 @@ function M.select_theme()
         M.set_theme(choice)
         M.apply_theme()
       else
-        pcall(vim.cmd.colorscheme, initial_theme)
+        pcall(vim.cmd, "colorscheme " .. initial_theme)
         M.apply_ghostty_theme(initial_theme)
       end
     end)

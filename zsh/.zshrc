@@ -32,7 +32,6 @@ _source_plugin zsh-autosuggestions
 # ── Tools ─────────────────────────────────────────────────────────────────────
 [[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
 [[ -d "$HOME/.local/share/mise/shims" ]] && export PATH="$HOME/.local/share/mise/shims:$PATH"
-command -v zoxide  &>/dev/null && eval "$(zoxide init zsh --cmd cd)"
 command -v starship &>/dev/null && eval "$(starship init zsh)"
 
 # ── Aliases ───────────────────────────────────────────────────────────────────
@@ -41,3 +40,7 @@ command -v starship &>/dev/null && eval "$(starship init zsh)"
 
 # Added by Antigravity CLI installer
 export PATH="/Users/camk/.local/bin:$PATH"
+
+# Zoxide
+command -v zoxide  &>/dev/null && eval "$(zoxide init zsh --cmd cd)"
+
