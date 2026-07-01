@@ -37,3 +37,7 @@ command -v starship &>/dev/null && eval "$(starship init zsh)"
 
 # ── Aliases ───────────────────────────────────────────────────────────────────
 [[ -f ~/.config/shell/aliases ]] && source ~/.config/shell/aliases
+
+
+# Added by Antigravity CLI installer
+export PATH="/Users/camk/.local/bin:$PATH"

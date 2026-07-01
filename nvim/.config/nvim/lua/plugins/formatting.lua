@@ -4,10 +4,18 @@ return {
         opts = {
             formatters_by_ft = {
                 python = { "black" },
-                rust = { "rustfmt" },
-                go = { "gofmt" },
                 lua = { "stylua" },
-                ruby = { "rubocop" },
+                javascript = { "prettierd" },
+                javascriptreact = { "prettierd" },
+                typescript = { "prettierd" },
+                typescriptreact = { "prettierd" },
+                json = { "prettierd" },
+                jsonc = { "prettierd" },
+                css = { "prettierd" },
+                scss = { "prettierd" },
+                html = { "prettierd" },
+                yaml = { "prettierd" },
+                markdown = { "prettierd" },
             },
             formatters = {
                 stylua = { prepend_args = { "--indent-type", "Spaces", "--indent-width", "4" } },

@@ -5,7 +5,7 @@
 
 declare -A PKG_GROUPS=(
   [terminal]="shell zsh bash starship tmux"
-  [nvim]="mise nvim uncrustify ruby"
+  [nvim]="mise nvim uncrustify"
   [gui]="ghostty"
 )
 PKG_GROUP_ORDER=(terminal nvim gui)

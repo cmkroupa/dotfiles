@@ -18,6 +18,9 @@ return {
                 root_markers = { "compile_commands.json" },
                 cmd = { "clangd", "--background-index", "--fallback-style=none" },
             })
+            vim.lsp.config("pyright", {
+                settings = { python = { pythonPath = vim.fn.exepath("python") } },
+            })
             vim.lsp.config("lua_ls", {
                 settings = {
                     Lua = {
@@ -27,9 +30,57 @@ return {
                     },
                 },
             })
+            local ts_inlay_hints = {
+                includeInlayParameterNameHints = "all",
+                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                includeInlayFunctionParameterTypeHints = true,
+                includeInlayVariableTypeHints = true,
+                includeInlayPropertyDeclarationTypeHints = true,
+                includeInlayFunctionLikeReturnTypeHints = true,
+                includeInlayEnumMemberValueHints = true,
+            }
+
+            local function get_typescript_root_dir(fname)
+                local monorepo_root = vim.fs.root(fname, {
+                    "pnpm-workspace.yaml",
+                    "pnpm-lock.yaml",
+                    "yarn.lock",
+                    "package-lock.json",
+                    "bun.lockb",
+                    "turbo.json",
+                    "lerna.json",
+                })
+                if monorepo_root then
+                    return monorepo_root
+                end
+                return vim.fs.root(fname, { "tsconfig.json", "package.json", ".git" })
+            end
+
+            vim.lsp.config("ts_ls", {
+                root_dir = get_typescript_root_dir,
+                settings = {
+                    typescript = {
+                        inlayHints = ts_inlay_hints,
+                        preferences = {
+                            preferGoToSourceDefinition = true,
+                        },
+                    },
+                    javascript = {
+                        inlayHints = ts_inlay_hints,
+                        preferences = {
+                            preferGoToSourceDefinition = true,
+                        },
+                    },
+                },
+            })
+
+            vim.lsp.config("eslint", {
+                settings = {
+                    workingDirectory = { mode = "location" },
+                },
+            })
 
             vim.lsp.enable(servers.mason_lsp)
-            vim.lsp.enable(servers.gem_lsp)
 
             vim.api.nvim_create_autocmd("LspAttach", {
                 callback = function(args)
@@ -38,6 +89,14 @@ return {
                     local ext = function(desc) return vim.tbl_extend("force", opts, { desc = desc }) end
 
                     vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
+
+                    local client = vim.lsp.get_client_by_id(args.data.client_id)
+                    if client and client.name == "eslint" then
+                        vim.api.nvim_create_autocmd("BufWritePre", {
+                            buffer = args.buf,
+                            command = "LspEslintFixAll",
+                        })
+                    end
 
                     for _, k in ipairs({ "grn", "gra", "grr", "gri" }) do
                         pcall(vim.keymap.del, "n", k, { buffer = args.buf })

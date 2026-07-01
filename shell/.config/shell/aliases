@@ -1,7 +1,7 @@
 alias godot='cd ~/dotfiles'
 alias ..='cd ..'
 alias ...='cd ../..'
-command -v eza &>/dev/null && alias ls='eza --icons --group-directories-first'
+command -v eza &>/dev/null && alias ls='eza --icons --group-directories-first --ignore-glob="*.tsbuildinfo|tsconfig.build.json|nest-cli.json|.eslintrc.js|.prettierrc"'
 command -v eza &>/dev/null && alias ll='eza -la --icons --group-directories-first --git'
 function cat() {
   if [[ $# -eq 1 && "$1" == *.md ]] && command -v glow &>/dev/null; then
