@@ -3,4 +3,5 @@ node = "lts"
 pnpm = "latest"
 python = "latest"
 lua = "latest"
+go = "latest"
 # tmux managed by system (mise shims break on WSL with no tty)

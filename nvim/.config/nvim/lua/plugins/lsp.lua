@@ -13,7 +13,78 @@ return {
     { "neovim/nvim-lspconfig",
         dependencies = { "williamboman/mason-lspconfig.nvim" },
         config = function()
-            vim.lsp.config("emmet_ls", { filetypes = { "html", "css", "scss" } })
+            local html_template_filetypes = { "html", "templ", "gotmpl" }
+
+            vim.filetype.add({
+                extension = {
+                    gohtml = "gotmpl",
+                    gotmpl = "gotmpl",
+                    tmpl = "gotmpl",
+                    templ = "templ",
+                },
+                pattern = {
+                    [".*%.html%.tmpl"] = "gotmpl",
+                },
+            })
+
+            vim.lsp.config("emmet_ls", { filetypes = { "html", "css", "scss", "templ", "gotmpl" } })
+            vim.lsp.config("html", { filetypes = html_template_filetypes })
+            vim.lsp.config("htmx", { filetypes = html_template_filetypes })
+            vim.lsp.config("tailwindcss", {
+                filetypes = {
+                    "aspnetcorerazor",
+                    "astro",
+                    "astro-markdown",
+                    "blade",
+                    "clojure",
+                    "django-html",
+                    "htmldjango",
+                    "edge",
+                    "eelixir",
+                    "elixir",
+                    "ejs",
+                    "erb",
+                    "eruby",
+                    "gohtml",
+                    "gohtmltmpl",
+                    "haml",
+                    "handlebars",
+                    "hbs",
+                    "html",
+                    "htmlangular",
+                    "html-eex",
+                    "heex",
+                    "jade",
+                    "leaf",
+                    "liquid",
+                    "markdown",
+                    "mdx",
+                    "mustache",
+                    "njk",
+                    "nunjucks",
+                    "php",
+                    "razor",
+                    "slim",
+                    "twig",
+                    "css",
+                    "less",
+                    "postcss",
+                    "sass",
+                    "scss",
+                    "stylus",
+                    "sugarss",
+                    "javascript",
+                    "javascriptreact",
+                    "reason",
+                    "rescript",
+                    "typescript",
+                    "typescriptreact",
+                    "vue",
+                    "svelte",
+                    "templ",
+                    "gotmpl",
+                },
+            })
             vim.lsp.config("clangd", {
                 root_markers = { "compile_commands.json" },
                 cmd = { "clangd", "--background-index", "--fallback-style=none" },

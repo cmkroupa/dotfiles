@@ -23,11 +23,9 @@ return {
 			ensure_installed = {
 				"python", "c", "cpp", "php", "lua", "vim", "vimdoc",
 				"html", "css", "javascript", "typescript", "tsx", "json", "jsonc", "yaml",
-				"bash", "toml", "markdown", "markdown_inline", "make",
+				"bash", "toml", "markdown", "markdown_inline", "make", "go", "gomod", "gowork", "gosum", "templ",
 			},
 			auto_install = true,
-			highlight = { enable = true },
-			indent    = { enable = false },
 			textobjects = {
 				select = {
 					enable    = true,
@@ -57,6 +55,14 @@ return {
 		},
 		config = function(_, opts)
 			require("nvim-treesitter").setup(opts)
+
+			vim.api.nvim_create_autocmd("FileType", {
+				pattern = "*",
+				callback = function()
+					pcall(vim.treesitter.start)
+				end,
+			})
+
 			vim.treesitter.query.add_directive(
 				"set-lang-from-info-string!",
 				function(match, _, bufnr, pred, metadata)
