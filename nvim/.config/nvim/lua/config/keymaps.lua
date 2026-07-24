@@ -10,6 +10,32 @@ map("n", "<leader>l", "<cmd>Lazy<cr>", { desc = "Lazy" })
 map("n", "<leader>d", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics" })
 map("n", "<leader>`", function() require("config.theme").select_theme() end, { desc = "Theme Switcher" })
 
+vim.api.nvim_create_user_command("OpenLog", function(opts)
+    local path
+    if opts.args == "lsp" then
+        if vim.lsp.log and vim.lsp.log.get_filename then
+            path = vim.lsp.log.get_filename()
+        elseif vim.lsp.get_log_path then
+            path = vim.lsp.get_log_path()
+        end
+    elseif opts.args == "mason" then
+        path = vim.fn.stdpath("state") .. "/mason.log"
+    elseif opts.args == "lazy" then
+        path = vim.fn.stdpath("state") .. "/lazy.log"
+    elseif opts.args == "conform" then
+        path = vim.fn.stdpath("state") .. "/conform.log"
+    end
+    if not path then
+        vim.notify("Usage: OpenLog lsp|mason|lazy|conform", vim.log.levels.ERROR)
+        return
+    end
+    vim.cmd.edit(vim.fn.fnameescape(path))
+end, {
+    nargs = 1,
+    complete = function() return { "lsp", "mason", "lazy", "conform" } end,
+    desc = "Open a Neovim plugin/LSP log",
+})
+
 local _hl_ids = {}
 map("v", "<leader>th", function()
     local s = vim.fn.getpos("v")

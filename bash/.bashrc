@@ -7,22 +7,42 @@ bind '"\e[A": history-search-backward'
 bind '"\e[B": history-search-forward'
 
 # ── Path ──────────────────────────────────────────────────────────────────────
-[[ -d "$HOME/.local/bin" ]] && export PATH="$HOME/.local/bin:$PATH"
-export PATH="$HOME/dotfiles/bin:$PATH"
+_path_remove_prefix() {
+  local prefix="$1" entry new_path=""
+  IFS=: read -ra _path_entries <<< "$PATH"
+  for entry in "${_path_entries[@]}"; do
+    [[ "$entry" == "$prefix"* ]] && continue
+    [[ -n "$new_path" ]] && new_path+=":"
+    new_path+="$entry"
+  done
+  PATH="$new_path"
+}
+
+_path_prepend() {
+  [[ -d "$1" ]] || return
+  _path_remove_prefix "$1"
+  PATH="$1:$PATH"
+}
+
+_remove_runtime_manager_paths() {
+  _path_remove_prefix "/opt/anaconda3"
+  _path_remove_prefix "$HOME/.nvm"
+  unset CONDA_DEFAULT_ENV CONDA_EXE CONDA_PREFIX CONDA_PROMPT_MODIFIER CONDA_PYTHON_EXE CONDA_SHLVL
+  unset _CONDA_EXE _CONDA_ROOT _CE_CONDA GSETTINGS_SCHEMA_DIR_CONDA_BACKUP
+  unset NVM_DIR NVM_BIN NVM_INC NVM_CD_FLAGS
+  hash -r
+}
+_remove_runtime_manager_paths
+unset -f _remove_runtime_manager_paths
+
+_path_prepend "$HOME/.local/bin"
 
 # ── Tools & Runtimes ──────────────────────────────────────────────────────────
 [[ -f ~/.fzf.bash ]] && source ~/.fzf.bash
 
-# Conda (only if installed)
-if [[ -f /opt/anaconda3/bin/conda ]]; then
-  __conda_setup="$('/opt/anaconda3/bin/conda' 'shell.bash' 'hook' 2>/dev/null)"
-  [[ $? -eq 0 ]] && eval "$__conda_setup" || export PATH="/opt/anaconda3/bin:$PATH"
-  unset __conda_setup
-fi
-
 # Mise
 command -v mise &>/dev/null && eval "$(mise activate bash)" || {
-  [[ -d "$HOME/.local/share/mise/shims" ]] && export PATH="$HOME/.local/share/mise/shims:$PATH"
+  _path_prepend "$HOME/.local/share/mise/shims"
 }
 
 # Starship Prompt
@@ -31,10 +51,7 @@ command -v starship &>/dev/null && eval "$(starship init bash)"
 # ── Aliases ───────────────────────────────────────────────────────────────────
 [[ -f ~/.config/shell/aliases ]] && source ~/.config/shell/aliases
 
-
-# Added by Antigravity CLI installer
-export PATH="/Users/camk/.local/bin:$PATH"
-
 # Zoxide
 command -v zoxide &>/dev/null && eval "$(zoxide init bash --cmd cd)"
 
+unset -f _path_prepend _path_remove_prefix

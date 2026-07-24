@@ -1,6 +1,7 @@
 nvim/.config/nvim/lazy-lock.json
 .claude/
-.bak/
-tmp/
 .ruby-lsp/
+.bak/
+target/
 **/active_theme.txt
+*.log

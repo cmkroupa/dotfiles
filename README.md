@@ -4,9 +4,9 @@ Personal dotfiles managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
 ## Requirements
 
-- bash 4+
 - git
 - stow (`sudo apt install stow`)
+- cargo
 
 ## Install
 
@@ -15,32 +15,40 @@ Run once on a new machine:
 ```sh
 git clone https://github.com/ckroupa/dotfiles ~/dotfiles
 cd ~/dotfiles
-./install.sh
+cargo install --path .
+dot install
 ```
+
+After `cargo install --path .`, `dot` can run from anywhere. It uses `DOTFILES_DIR` when set, otherwise it looks from the current directory upward and then falls back to `~/dotfiles`.
 
 This will:
 1. Detect your OS and package manager
 2. Abort if conflicting runtime managers are found (pyenv, conda, nvm, asdf, rbenv, rvm)
 3. Install all packages via apt/brew/pacman/dnf
-4. Run per-package install scripts (mise, glow, lazygit, starship)
-5. Symlink everything into `~` via stow
+4. Symlink everything into `~` via stow
+5. Run Rust package installers for mise, Rails, glow, lazygit, and starship
+
+## Link
+
+```sh
+dot link
+```
+
+Relinks selected package groups without installing packages or running custom installers.
 
 ## Uninstall
 
 ```sh
-./uninstall.sh
+dot uninstall
 ```
 
-Removes all symlinks and restores any files that were backed up before linking.
+Removes managed symlinks and restores files previously moved into `.bak/<package>/`.
 
 ## Scripts
 
 | Script | Purpose |
 |--------|---------|
-| `install.sh` | Full setup — install packages and symlink dotfiles |
-| `uninstall.sh` | Remove symlinks and restore backed-up files |
-| `lib/link.sh` | Internal — called by install.sh to stow packages |
-| `lib/groups.sh` | Internal — defines which stow packages belong together |
+| `Cargo.toml` / `src/` | Rust CLI that owns install, link, uninstall, package groups, and Stow logic |
 
 ## Groups
 
@@ -48,22 +56,20 @@ Packages are organized into groups. Selecting a group links all members together
 
 | Group | Packages | What it sets up |
 |-------|----------|-----------------|
-| `shell` | shell, zsh, bash | zshrc, bashrc, shared aliases |
-| `starship` | starship | cross-shell prompt |
-| `tmux` | tmux | terminal multiplexer |
-| `dev` | mise, nvim | runtime version manager + editor |
+| `terminal` | shell, zsh, bash, starship, tmux | shells, shared aliases, prompt, terminal multiplexer |
+| `nvim` | mise, nvim | runtime version manager and editor config |
+| `gui` | ghostty | terminal emulator config |
 
-To change groupings, edit `lib/groups.sh`.
+To change groupings, edit `GROUPS` in `src/config.rs`. Group-specific installer code lives in `src/install/terminal.rs`, `src/install/nvim.rs`, and `src/install/gui.rs`.
 
 ## What gets installed
 
 | Group | Installed via |
 |-------|--------------|
-| shell | zsh, fzf, zoxide, zsh-syntax-highlighting, zsh-autosuggestions, bat, eza, fd, glow (binary) |
-| starship | curl from starship.rs |
-| tmux | tmux |
-| dev | neovim, ripgrep (apt), lazygit + mise (binaries) |
+| terminal | zsh, fzf, zoxide, zsh-syntax-highlighting, zsh-autosuggestions, bat, eza, fd, glow, starship, tmux |
+| nvim | neovim, ripgrep, lazygit, mise, Ruby via mise, Rails via gem |
+| gui | ghostty config only |
 
-## Backups
+## Conflicts
 
-Before symlinking, `lib/link.sh` moves any conflicting files into `.bak/<package>/`. Running `uninstall.sh` restores them.
+Before Stow linking, conflicting files are moved into `.bak/<package>/`. `dot uninstall` restores those backups after unstowing.

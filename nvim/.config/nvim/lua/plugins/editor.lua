@@ -23,9 +23,12 @@ return {
 			ensure_installed = {
 				"python", "c", "cpp", "php", "lua", "vim", "vimdoc",
 				"html", "css", "javascript", "typescript", "tsx", "json", "jsonc", "yaml",
-				"bash", "toml", "markdown", "markdown_inline", "make", "go", "gomod", "gowork", "gosum", "templ",
+				"bash", "toml", "markdown", "markdown_inline", "make", "cmake",
+				"rust", "ruby", "embedded_template", "go", "gomod", "gosum", "gowork", "java", "templ",
 			},
 			auto_install = true,
+			highlight = { enable = true },
+			indent    = { enable = false },
 			textobjects = {
 				select = {
 					enable    = true,

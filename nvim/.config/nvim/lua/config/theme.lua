@@ -27,9 +27,9 @@ M.themes = {
 -- Maps Neovim themes to Ghostty's built-in theme identifiers for seamless sync
 function M.apply_ghostty_theme(theme_name)
   local map = {
-    ["catppuccin-macchiato"] = "catppuccin-macchiato",
-    ["catppuccin-mocha"] = "catppuccin-mocha",
-    ["catppuccin-latte"] = "catppuccin-latte",
+    ["catppuccin-macchiato"] = "Catppuccin Macchiato",
+    ["catppuccin-mocha"] = "Catppuccin Mocha",
+    ["catppuccin-latte"] = "Catppuccin Latte",
     ["tokyonight-storm"] = "TokyoNight Storm",
     ["tokyonight-night"] = "TokyoNight",
     ["tokyonight-moon"] = "TokyoNight Moon",

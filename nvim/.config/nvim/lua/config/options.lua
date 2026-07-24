@@ -15,6 +15,12 @@ vim.opt.swapfile = false
 vim.opt.undofile = true
 vim.opt.updatetime = 250
 vim.opt.timeoutlen = 300
+vim.opt.clipboard = "unnamedplus"
+
+local mise_shims = vim.fn.expand("~/.local/share/mise/shims")
+if vim.fn.isdirectory(mise_shims) == 1 and not vim.env.PATH:find("^" .. vim.pesc(mise_shims) .. ":") then
+    vim.env.PATH = mise_shims .. ":" .. vim.env.PATH
+end
 
 vim.diagnostic.config({
     update_in_insert = false,
@@ -28,7 +34,6 @@ vim.cmd("runtime macros/matchit.vim")
 
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
-vim.opt.colorcolumn = "80"
 
 
 if vim.fn.has("wsl") == 1 then

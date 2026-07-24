@@ -28,7 +28,12 @@ return {
             })
 
             vim.lsp.config("emmet_ls", { filetypes = { "html", "css", "scss", "templ", "gotmpl" } })
-            vim.lsp.config("html", { filetypes = html_template_filetypes })
+            vim.lsp.config("html", {
+                filetypes = { "html", "eruby", "templ", "gotmpl" },
+                init_options = {
+                    provideFormatter = false,
+                },
+            })
             vim.lsp.config("htmx", { filetypes = html_template_filetypes })
             vim.lsp.config("tailwindcss", {
                 filetypes = {
@@ -87,7 +92,15 @@ return {
             })
             vim.lsp.config("clangd", {
                 root_markers = { "compile_commands.json" },
-                cmd = { "clangd", "--background-index", "--fallback-style=none" },
+                cmd = { "clangd", "--background-index", "--clang-tidy", "--fallback-style=none" },
+            })
+            vim.lsp.config("bashls", {
+                settings = {
+                    bashIde = {
+                        shellcheckPath = "",
+                        shfmt = { path = "" },
+                    },
+                },
             })
             vim.lsp.config("pyright", {
                 settings = { python = { pythonPath = vim.fn.exepath("python") } },
@@ -144,10 +157,19 @@ return {
                     },
                 },
             })
-
-            vim.lsp.config("eslint", {
+            vim.lsp.config("rust_analyzer", {
                 settings = {
-                    workingDirectory = { mode = "location" },
+                    ["rust-analyzer"] = {
+                        check = {
+                            command = "clippy",
+                        },
+                    },
+                },
+            })
+            vim.lsp.config("ruby_lsp", {
+                init_options = {
+                    formatter = "none",
+                    linters = {},
                 },
             })
 
@@ -160,14 +182,6 @@ return {
                     local ext = function(desc) return vim.tbl_extend("force", opts, { desc = desc }) end
 
                     vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
-
-                    local client = vim.lsp.get_client_by_id(args.data.client_id)
-                    if client and client.name == "eslint" then
-                        vim.api.nvim_create_autocmd("BufWritePre", {
-                            buffer = args.buf,
-                            command = "LspEslintFixAll",
-                        })
-                    end
 
                     for _, k in ipairs({ "grn", "gra", "grr", "gri" }) do
                         pcall(vim.keymap.del, "n", k, { buffer = args.buf })
