@@ -67,14 +67,26 @@ local function ruby_project_root(bufnr)
     return vim.fs.root(start, { "Gemfile", "gems.rb" })
 end
 
+local function ruby_command(bufnr)
+    local root = ruby_project_root(bufnr)
+    if root and vim.fn.executable("bundle") == 1 then
+        return {
+            command = "bundle",
+            args = { "exec", "rubocop" },
+            cwd = function(_, ctx)
+                return vim.fs.root(ctx.dirname, { "Gemfile", "gems.rb" })
+            end,
+        }
+    end
+    return { command = "rubocop", args = {} }
+end
+
 local function rubocop_args(prefix)
     local args = vim.list_extend(prefix or {}, {
-        "--server",
         "-a",
         "-f",
         "quiet",
         "--stderr",
-        "--stdin",
         "$FILENAME",
     })
     return args
@@ -85,7 +97,6 @@ local function rubocop_lint_args(prefix)
         "--format",
         "json",
         "--force-exclusion",
-        "--server",
         "--stdin",
         function() return vim.api.nvim_buf_get_name(0) end,
     })
@@ -99,29 +110,22 @@ return {
             local conform = require("conform")
             conform.setup({
                 formatters_by_ft = formatters_by_ft,
+                format_on_save = {
+                    timeout_ms = 30000,
+                    lsp_format = "fallback",
+                },
+                notify_on_error = true,
                 formatters = {
                     rubocop = function(bufnr)
-                        if ruby_project_root(bufnr) then
-                            return { command = "bundle", args = rubocop_args({ "exec", "rubocop" }), exit_codes = { 0, 1 } }
-                        end
-                        return { command = "rubocop", args = rubocop_args(), exit_codes = { 0, 1 } }
+                        local formatter = ruby_command(bufnr)
+                        formatter.args = rubocop_args(formatter.args)
+                        formatter.stdin = false
+                        formatter.tmpfile_format = "conform.$RANDOM.$FILENAME"
+                        formatter.exit_codes = { 0, 1 }
+                        return formatter
                     end,
                     stylua = { prepend_args = { "--indent-type", "Spaces", "--indent-width", "4" } },
                 },
-            })
-
-            vim.api.nvim_create_autocmd("BufWritePre", {
-                group = vim.api.nvim_create_augroup("UserFormatOnSave", { clear = true }),
-                callback = function(args)
-                    conform.format({ bufnr = args.buf, timeout_ms = 5000, lsp_format = "fallback" }, function(err)
-                        if err then
-                            local message = tostring(err):match("==> ERROR:%s*([^\n]+)")
-                                or tostring(err):match("error:%s*([^\n]+)")
-                                or tostring(err):gsub("\n.*", "")
-                            vim.notify(message, vim.log.levels.ERROR, { title = "Format failed" })
-                        end
-                    end)
-                end,
             })
 
             vim.api.nvim_create_autocmd("FileType", {
@@ -147,6 +151,7 @@ return {
                 if ruby_project_root(0) then
                     linter.cmd = "bundle"
                     linter.args = rubocop_lint_args({ "exec", "rubocop" })
+                    linter.cwd = ruby_project_root(0)
                 else
                     linter.cmd = "rubocop"
                     linter.args = rubocop_lint_args()

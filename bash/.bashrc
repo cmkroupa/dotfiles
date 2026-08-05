@@ -55,3 +55,8 @@ command -v starship &>/dev/null && eval "$(starship init bash)"
 command -v zoxide &>/dev/null && eval "$(zoxide init bash --cmd cd)"
 
 unset -f _path_prepend _path_remove_prefix
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/camk/.lmstudio/bin"
+# End of LM Studio CLI section
+
