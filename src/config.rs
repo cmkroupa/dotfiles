@@ -5,10 +5,11 @@ use std::path::{Path, PathBuf};
 use crate::process::{command_exists, command_path, run_stdout};
 
 pub(crate) const GROUPS: &[(&str, &[&str])] = &[
-    ("terminal", &["shell", "zsh", "bash", "starship", "tmux"]),
+    ("terminal", &["shell", "zsh", "starship", "tmux"]),
     ("nvim", &["mise", "nvim"]),
     ("gui", &["ghostty"]),
 ];
+
 
 const RUNTIME_MANAGERS: &[RuntimeManager] = &[
     RuntimeManager {
@@ -182,10 +183,11 @@ fn detect_os() -> String {
 }
 
 fn detect_pm() -> String {
-    for pm in ["brew", "apt", "pacman", "dnf"] {
+    for pm in ["brew", "apt", "dnf"] {
         if command_exists(pm) {
             return pm.to_string();
         }
     }
     "none".to_string()
 }
+

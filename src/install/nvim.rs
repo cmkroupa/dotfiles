@@ -36,12 +36,13 @@ fn install_rails() -> Result<(), String> {
         return Err("mise was installed, but is not available on PATH".to_string());
     };
 
-    run_status(Command::new(&mise).arg("install"))?;
+    let _ = Command::new(&mise).arg("install").output();
 
     if rails_installed(&mise) {
         println!("  rails already installed");
         return Ok(());
     }
+
 
     run_status(
         Command::new(&mise)
@@ -76,10 +77,11 @@ fn rails_installed(mise: &std::path::Path) -> bool {
         .arg("list")
         .arg("-i")
         .arg("rails")
-        .status()
-        .map(|status| status.success())
+        .output()
+        .map(|out| out.status.success())
         .unwrap_or(false)
 }
+
 
 fn install_lazygit(ctx: &Context) -> Result<(), String> {
     if command_exists("lazygit") {

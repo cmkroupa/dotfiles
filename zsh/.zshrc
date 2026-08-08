@@ -72,7 +72,4 @@ command -v zoxide  &>/dev/null && eval "$(zoxide init zsh --cmd cd)"
 
 unfunction _path_prepend
 
-# Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/camk/.lmstudio/bin"
-# End of LM Studio CLI section
 

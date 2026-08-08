@@ -27,14 +27,10 @@ pub(crate) fn install(ctx: &Context) -> Result<(), String> {
     terminal::install(ctx, &packages)?;
     nvim::install(ctx, &packages)?;
     gui::install(ctx, &packages)?;
-    let rc = match env::var("SHELL").unwrap_or_default().as_str() {
-        shell if shell.ends_with("/zsh") => "~/.zshrc",
-        shell if shell.ends_with("/bash") => "~/.bashrc",
-        _ => "your shell's rc file",
-    };
-    println!("Done. Run: source {rc}");
+    println!("Done. Run: source ~/.zshrc");
     Ok(())
 }
+
 
 fn abort_on_runtime_conflicts(ctx: &Context) -> Result<(), String> {
     let conflicts = runtime_conflicts(ctx);
@@ -62,14 +58,14 @@ fn require_stow(pm: &str) -> Result<(), String> {
         return Ok(());
     }
     let cmd = match pm {
-        "apt" => "sudo apt install stow",
         "brew" => "brew install stow",
-        "pacman" => "sudo pacman -S stow",
+        "apt" => "sudo apt install stow",
         "dnf" => "sudo dnf install stow",
         _ => "install stow via your package manager",
     };
     Err(format!("stow required: {cmd}"))
 }
+
 
 pub(crate) fn package_manifest_entries(ctx: &Context, stow_packages: &[String]) -> Vec<String> {
     let mut seen = BTreeSet::new();
@@ -128,13 +124,6 @@ fn install_packages(ctx: &Context, stow_packages: &[String]) -> Result<(), Strin
                 .arg("-y")
                 .args(&packages),
         )?,
-        "pacman" => run_status(
-            Command::new("sudo")
-                .arg("pacman")
-                .arg("-S")
-                .arg("--noconfirm")
-                .args(&packages),
-        )?,
         "dnf" => run_status(
             Command::new("sudo")
                 .arg("dnf")
@@ -142,6 +131,7 @@ fn install_packages(ctx: &Context, stow_packages: &[String]) -> Result<(), Strin
                 .arg("-y")
                 .args(&packages),
         )?,
+
         _ => println!(
             "No package manager - install manually: {}",
             packages.join(" ")

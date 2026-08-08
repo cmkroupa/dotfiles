@@ -170,6 +170,11 @@ return {
                 init_options = {
                     formatter = "none",
                     linters = {},
+                    addonSettings = {
+                        ["Ruby LSP Rails"] = {
+                            enablePendingMigrationsPrompt = false,
+                        },
+                    },
                 },
             })
 

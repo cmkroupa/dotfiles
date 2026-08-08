@@ -3,6 +3,122 @@ alias ..='cd ..'
 alias ...='cd ../..'
 command -v eza &>/dev/null && alias ls='eza --icons --group-directories-first --ignore-glob="*.tsbuildinfo|tsconfig.build.json|nest-cli.json|.eslintrc.js|.prettierrc"'
 command -v eza &>/dev/null && alias ll='eza -la --icons --group-directories-first --git'
+
+# Dedicated Pi NAS helpers (ckroupa@ck-pi:/mnt/nas/my-data)
+pils() {
+  local remote="ckroupa@ck-pi"
+  local base="/mnt/nas/my-data"
+  local -a flags=()
+  local subpath=""
+
+  for arg in "$@"; do
+    if [[ "$arg" == -* ]]; then
+      flags+=("$arg")
+    else
+      subpath="$arg"
+    fi
+  done
+
+  # Default to -A if no flags provided so hidden files like .env are visible
+  if [[ ${#flags[@]} -eq 0 ]]; then
+    flags=("-A")
+  fi
+
+  local target="$base"
+  if [[ -n "$subpath" ]]; then
+    if [[ "$subpath" == /* ]]; then
+      target="$subpath"
+    else
+      target="$base/${subpath#/}"
+    fi
+  fi
+
+  ssh -q "$remote" "ls ${flags[*]} \"$target\"" 2> >(grep -v 'line editing not enabled' >&2)
+}
+
+pill() {
+  pils -la "$@"
+}
+
+picp() {
+  local remote="ckroupa@ck-pi"
+  local base="/mnt/nas/my-data"
+
+  if [[ $# -eq 0 ]]; then
+    echo "Usage (Upload):   picp [scp-options] <local-path...> [remote-subpath]"
+    echo "Usage (Download): picp [scp-options] -d <remote-subpath> [local-dest]"
+    return 1
+  fi
+
+  local -a flags=()
+  local -a positional=()
+  local download=0
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -d|--download)
+        download=1
+        ;;
+      -*)
+        flags+=("$1")
+        ;;
+      *)
+        positional+=("$1")
+        ;;
+    esac
+    shift
+  done
+
+  if [[ ${#positional[@]} -eq 0 ]]; then
+    echo "picp: error: missing path argument"
+    return 1
+  fi
+
+  local first="${positional[0]}"
+  if [[ "$first" == pi:* || "$first" == :* ]]; then
+    download=1
+    positional[0]="${first#*:}"
+  fi
+
+  if [[ $download -eq 1 ]]; then
+    local src="${positional[0]}"
+    local dest="${positional[1]:-.}"
+    local src_path="$base"
+    if [[ -n "$src" ]]; then
+      if [[ "$src" == /* ]]; then
+        src_path="$src"
+      else
+        src_path="$base/${src#/}"
+      fi
+    fi
+    scp -r "${flags[@]}" "$remote:$src_path" "$dest"
+  else
+    local dest=""
+    local -a sources=()
+    if [[ ${#positional[@]} -gt 1 ]]; then
+      local last="${positional[-1]}"
+      if [[ ! -e "$last" ]]; then
+        dest="$last"
+        sources=("${positional[@]:0:${#positional[@]}-1}")
+      else
+        sources=("${positional[@]}")
+      fi
+    else
+      sources=("${positional[@]}")
+    fi
+
+    local dest_path="$base"
+    if [[ -n "$dest" ]]; then
+      if [[ "$dest" == /* ]]; then
+        dest_path="$dest"
+      else
+        dest_path="$base/${dest#/}"
+      fi
+    fi
+
+    scp -r "${flags[@]}" "${sources[@]}" "$remote:$dest_path/"
+  fi
+}
 function cat() {
   if [[ $# -eq 1 && "$1" == *.md ]] && command -v glow &>/dev/null; then
     glow "$1"
@@ -44,3 +160,9 @@ uncrust() {
     clang-format -i --style="$style" "$f" && echo "formatted: $f"
   done
 }
+
+
+
+
+
+

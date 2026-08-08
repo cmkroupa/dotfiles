@@ -2,6 +2,7 @@
 
 # Import the active theme which is dynamically managed
 config-file = active_theme
+initial-command = /opt/homebrew/bin/tmux
 
 # Typography
 font-family = "FiraCode Nerd Font"
@@ -13,6 +14,7 @@ window-padding-x = 12
 window-padding-y = 12
 background-opacity = 0.95
 background-blur = 20
+macos-titlebar-style = hidden
 
 # Settings
 confirm-close-surface = false
