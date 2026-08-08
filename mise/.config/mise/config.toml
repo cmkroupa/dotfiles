@@ -7,4 +7,3 @@ rust = "latest"
 lua = "latest"
 go = "latest"
 java = "latest"
-# tmux managed by system (mise shims break on WSL with no tty)

@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use crate::process::{command_exists, command_path, run_stdout};
 
 pub(crate) const GROUPS: &[(&str, &[&str])] = &[
-    ("terminal", &["shell", "zsh", "starship", "tmux"]),
+    ("terminal", &["shell", "zsh", "starship"]),
     ("nvim", &["mise", "nvim"]),
     ("gui", &["ghostty"]),
 ];
@@ -190,4 +190,3 @@ fn detect_pm() -> String {
     }
     "none".to_string()
 }
-

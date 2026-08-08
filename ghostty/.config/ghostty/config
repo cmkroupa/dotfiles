@@ -2,7 +2,6 @@
 
 # Import the active theme which is dynamically managed
 config-file = active_theme
-initial-command = /opt/homebrew/bin/tmux
 
 # Typography
 font-family = "FiraCode Nerd Font"
@@ -20,3 +19,28 @@ macos-titlebar-style = hidden
 confirm-close-surface = false
 macos-option-as-alt = true
 copy-on-select = true
+
+# Navigation
+keybind = super+shift+p=previous_tab
+keybind = super+shift+n=next_tab
+keybind = super+shift+t=new_tab
+keybind = super+d=unbind
+keybind = super+shift+d=unbind
+keybind = super+shift+i=new_split:right
+keybind = "super+shift+[=unbind"
+keybind = "super+shift+]=unbind"
+keybind = "super+[=unbind"
+keybind = "super+]=unbind"
+keybind = super+alt+arrow_up=unbind
+keybind = super+alt+arrow_down=unbind
+keybind = super+alt+arrow_left=unbind
+keybind = super+alt+arrow_right=unbind
+keybind = super+shift+h=goto_split:left
+keybind = super+shift+j=goto_split:down
+keybind = super+shift+k=goto_split:up
+keybind = super+shift+l=goto_split:right
+keybind = super+n=unbind
+keybind = super+shift+w=close_tab:this
+keybind = super+alt+w=unbind
+keybind = super+w=unbind
+keybind = super+shift+s=close_surface

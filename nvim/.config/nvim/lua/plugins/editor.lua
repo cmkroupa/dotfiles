@@ -14,7 +14,6 @@ return {
 		},
 	},
 	{ "folke/trouble.nvim", opts = {} },
-	{ "christoomey/vim-tmux-navigator", lazy = false },
 	{
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",

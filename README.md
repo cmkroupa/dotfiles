@@ -56,7 +56,7 @@ Packages are organized into groups. Selecting a group links all members together
 
 | Group | Packages | What it sets up |
 |-------|----------|-----------------|
-| `terminal` | shell, zsh, bash, starship, tmux | shells, shared aliases, prompt, terminal multiplexer |
+| `terminal` | shell, zsh, bash, starship | shells, shared aliases, prompt |
 | `nvim` | mise, nvim | runtime version manager and editor config |
 | `gui` | ghostty | terminal emulator config |
 
@@ -66,7 +66,7 @@ To change groupings, edit `GROUPS` in `src/config.rs`. Group-specific installer 
 
 | Group | Installed via |
 |-------|--------------|
-| terminal | zsh, fzf, zoxide, zsh-syntax-highlighting, zsh-autosuggestions, bat, eza, fd, glow, starship, tmux |
+| terminal | zsh, fzf, zoxide, zsh-syntax-highlighting, zsh-autosuggestions, bat, eza, fd, glow, starship |
 | nvim | neovim, ripgrep, lazygit, mise, Ruby via mise, Rails via gem |
 | gui | ghostty config only |
 
