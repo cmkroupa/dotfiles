@@ -8,6 +8,5 @@ alias cat='bat --paging=never'
 alias v='nvim'
 alias rg='rg --smart-case'
 alias path='echo $PATH | tr ":" "\n"'
-alias redot='source ~/.zshrc'
 
 function mkcd() { mkdir -p "$1" && cd "$1"; }
