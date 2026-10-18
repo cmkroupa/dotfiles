@@ -27,11 +27,11 @@ It's safe to rerun. Everything it installs is recorded in `.bak/installed`.
 
 | Folder | Config for | Installs |
 |--------|------------|----------|
-| `shell` | shared aliases and `keys` | eza |
-| `zsh` | `.zshrc` | zsh, zsh-syntax-highlighting, zsh-autosuggestions |
+| `shell` | shared aliases, `keys`, `update` | eza, btop |
+| `zsh` | `.zshrc`, `.zprofile` | zsh, zsh-syntax-highlighting, zsh-autosuggestions |
 | `starship` | prompt | config only (starship comes from mise) |
 | `tmux` | `.tmux.conf` | tmux |
-| `mise` | languages and CLI tools | mise, then everything in `mise/.config/mise/config.toml`: node, python, ruby + rails, neovim, fzf, ripgrep, fd, bat, zoxide, starship, lazygit |
+| `mise` | languages and CLI tools | mise, then everything in `mise/.config/mise/config.toml`: node, python, ruby + rails, neovim, fzf, ripgrep, fd, bat, zoxide, starship, lazygit, lazydocker |
 | `nvim` | neovim config | Ubuntu only: build tools and wl-clipboard |
 | `ghostty` | terminal emulator | config only |
 

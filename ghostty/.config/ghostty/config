@@ -22,3 +22,6 @@ macos-titlebar-style = hidden
 confirm-close-surface = false
 macos-option-as-alt = true
 copy-on-select = true
+
+# Quick terminal: drops down from the top from any app (macOS asks for Accessibility permission once)
+keybind = global:ctrl+grave_accent=toggle_quick_terminal

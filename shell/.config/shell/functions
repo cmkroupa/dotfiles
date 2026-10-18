@@ -5,3 +5,15 @@ function keys() {
   echo "Copy mode (scroll up, or Ctrl-b [)"
   tmux start-server \; list-keys -N -T copy-mode-vi | sed 's/^/  /'
 }
+
+# Upgrade everything: system packages, mise and its tools, Neovim plugins and Mason tools
+function update() {
+  if command -v brew &>/dev/null; then
+    brew update && brew upgrade
+  else
+    sudo apt update && sudo apt upgrade -y && mise self-update --yes
+  fi
+  mise upgrade
+  nvim --headless "+Lazy! sync" +qa
+  nvim --headless +MasonToolsUpdateSync +qa
+}
