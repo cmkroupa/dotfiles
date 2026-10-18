@@ -1,21 +1,24 @@
 # ── Ghostty Configuration ─────────────────────────────────────────────────────
 
-# Import the active theme which is dynamically managed
-import active_theme
+# Neovim's theme switcher overwrites active_theme; ? = fine if it doesn't exist yet
+theme = Catppuccin Macchiato
+config-file = ?active_theme
+# login shell so tmux is found on PATH (Homebrew on macOS, /usr/bin on Ubuntu)
+initial-command = /bin/zsh -lc tmux
 
 # Typography
 font-family = "FiraCode Nerd Font"
 font-size = 13.0
-adjust-line-height = 15%
+adjust-cell-height = 15%
 
 # Window Aesthetics
 window-padding-x = 12
 window-padding-y = 12
-window-background-opacity = 0.95
-window-background-blur = true
-background-blur-radius = 20
+background-opacity = 0.95
+background-blur = 20
+macos-titlebar-style = hidden
 
 # Settings
 confirm-close-surface = false
-macos-option-as-meta = true
+macos-option-as-alt = true
 copy-on-select = true

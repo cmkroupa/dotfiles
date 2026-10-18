@@ -1,6 +1,5 @@
-nvim/.config/nvim/lazy-lock.json
 .claude/
 .bak/
-tmp/
-.ruby-lsp/
-**/active_theme.txt
+# written by the Neovim theme switcher
+ghostty/.config/ghostty/active_theme
+*.log

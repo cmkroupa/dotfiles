@@ -1,33 +1,17 @@
 return {
-    { "catppuccin/nvim",
-        name = "catppuccin",
-        priority = 1000,
-        lazy = false,
-        opts = {
-            flavour = "macchiato",
-            integrations = {
-                bufferline = true, gitsigns = true, harpoon = true,
-                illuminate = { enabled = false },
-                lsp_trouble = true, mason = true,
-                mini = { enabled = true }, notify = true,
-                telescope = { enabled = true }, treesitter = true,
-                which_key = true,
-            },
-        },
-        config = function(_, opts)
-            require("catppuccin").setup(opts)
-        end,
-    },
-    { "folke/tokyonight.nvim", lazy = false, priority = 1000 },
-    { "rebelot/kanagawa.nvim", lazy = false, priority = 1000 },
-    { "ellisonleao/gruvbox.nvim", lazy = false, priority = 1000 },
-    { "rose-pine/neovim", name = "rose-pine", lazy = false, priority = 1000 },
-    { "navarasu/onedark.nvim", lazy = false, priority = 1000 },
-    { "EdenEast/nightfox.nvim", lazy = false, priority = 1000 },
-    { "sainnhe/everforest", lazy = false, priority = 1000 },
-    { "Mofiqul/dracula.nvim", lazy = false, priority = 1000 },
-    { "projekt0n/github-nvim-theme", lazy = false, priority = 1000 },
-    { "akinsho/bufferline.nvim",
+    -- Colorschemes load on demand: lazy.nvim pulls one in when :colorscheme names it
+    { "catppuccin/nvim", name = "catppuccin", lazy = true, opts = {} },
+    { "folke/tokyonight.nvim", lazy = true },
+    { "rebelot/kanagawa.nvim", lazy = true },
+    { "ellisonleao/gruvbox.nvim", lazy = true },
+    { "rose-pine/neovim", name = "rose-pine", lazy = true },
+    { "navarasu/onedark.nvim", lazy = true },
+    { "EdenEast/nightfox.nvim", lazy = true },
+    { "sainnhe/everforest", lazy = true },
+    { "Mofiqul/dracula.nvim", lazy = true },
+    { "projekt0n/github-nvim-theme", lazy = true },
+    {
+        "akinsho/bufferline.nvim",
         version = "*",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         opts = {
@@ -40,10 +24,8 @@ return {
             },
         },
     },
-    { "nvim-lualine/lualine.nvim",
-        lazy = false,
-        priority = 999,
-        dependencies = { "catppuccin/nvim" },
+    {
+        "nvim-lualine/lualine.nvim",
         opts = {
             options = {
                 theme = "auto",
@@ -61,8 +43,8 @@ return {
             },
         },
     },
-    { "rcarriga/nvim-notify",
-        lazy = false,
+    {
+        "rcarriga/nvim-notify",
         opts = {
             stages = "static",
             timeout = 3000,
@@ -74,22 +56,20 @@ return {
             vim.notify = notify
         end,
     },
-    { "folke/which-key.nvim",
+    {
+        "folke/which-key.nvim",
         opts = {
             win = { height = { min = 3, max = 8 } },
             spec = {
                 { "<leader>s", group = "Search" },
                 { "<leader>p", group = "Pins", icon = { icon = "󰐃", color = "cyan" } },
-                { "<leader>d", group = "Diagnostics" },
-                { "<leader>i", group = "Info" },
-                { "<leader>t", group = "Toggle" },
-                { "<leader>Y", hidden = true },
-                { "<leader>P", hidden = true },
+                { "<leader>t", group = "Toggle", hidden = true },
+                { "<leader>`", hidden = true },
                 { "gz", group = "Surround" },
-                { "[",  group = "Prev" },
-                { "]",  group = "Next" },
-                { "a",  group = "Around", mode = { "o", "x" } },
-                { "i",  group = "Inside", mode = { "o", "x" } },
+                { "[", group = "Prev" },
+                { "]", group = "Next" },
+                { "a", group = "Around", mode = { "o", "x" } },
+                { "i", group = "Inside", mode = { "o", "x" } },
             },
         },
     },

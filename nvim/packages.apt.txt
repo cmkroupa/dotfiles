@@ -1,0 +1,4 @@
+# to build telescope-fzf-native and unpack Mason tools; wl-clipboard for the system clipboard
+build-essential
+unzip
+wl-clipboard

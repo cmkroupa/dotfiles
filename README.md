@@ -1,69 +1,40 @@
 # dotfiles
 
-Personal dotfiles managed with [GNU Stow](https://www.gnu.org/software/stow/).
+Personal dotfiles for macOS and Ubuntu, managed with [GNU Stow](https://www.gnu.org/software/stow/).
 
-## Requirements
-
-- bash 4+
-- git
-- stow (`sudo apt install stow`)
-
-## Install
-
-Run once on a new machine:
+## Usage
 
 ```sh
 git clone https://github.com/ckroupa/dotfiles ~/dotfiles
 cd ~/dotfiles
-./install.sh
+./bootstrap
 ```
 
-This will:
-1. Detect your OS and package manager
-2. Abort if conflicting runtime managers are found (pyenv, conda, nvm, asdf, rbenv, rvm)
-3. Install all packages via apt/brew/pacman/dnf
-4. Run per-package install scripts (mise, glow, lazygit, starship)
-5. Symlink everything into `~` via stow
+Needs Homebrew on macOS or apt on Ubuntu. On Ubuntu before 24.04, apt has no eza, so bootstrap skips it and prints where to get it. It asks `[i]nstall  [u]ninstall  [q]uit` (one keypress), or pass the letter directly: `./bootstrap i`.
 
-## Uninstall
+**Install** (`i`):
+1. Aborts if conflicting runtime managers are found (pyenv, conda, nvm, asdf, rbenv, rvm)
+2. Installs stow and every folder's `packages.txt` (or `packages.brew.txt` / `packages.apt.txt` when present)
+3. Moves any files that would be overwritten into `.bak/`, then symlinks every config into `~`
+4. Installs mise and runs `mise install` (languages, Rails, and the CLI tools)
+5. Makes zsh your login shell if it isn't already
 
-```sh
-./uninstall.sh
-```
+It's safe to rerun. Everything it installs is recorded in `.bak/installed`.
 
-Removes all symlinks and restores any files that were backed up before linking.
+**Uninstall** (`u`, asks to confirm): unlinks every config, puts back the files that were moved into `.bak/`, and removes only what install added. Anything you already had stays, and so does your login shell.
 
-## Scripts
+## What's in here
 
-| Script | Purpose |
-|--------|---------|
-| `install.sh` | Full setup — install packages and symlink dotfiles |
-| `uninstall.sh` | Remove symlinks and restore backed-up files |
-| `lib/link.sh` | Internal — called by install.sh to stow packages |
-| `lib/groups.sh` | Internal — defines which stow packages belong together |
+| Folder | Config for | Installs |
+|--------|------------|----------|
+| `shell` | shared aliases and `keys` | eza |
+| `zsh` | `.zshrc` | zsh, zsh-syntax-highlighting, zsh-autosuggestions |
+| `starship` | prompt | config only (starship comes from mise) |
+| `tmux` | `.tmux.conf` | tmux |
+| `mise` | languages and CLI tools | mise, then everything in `mise/.config/mise/config.toml`: node, python, ruby + rails, neovim, fzf, ripgrep, fd, bat, zoxide, starship, lazygit |
+| `nvim` | neovim config | Ubuntu only: build tools and wl-clipboard |
+| `ghostty` | terminal emulator | config only |
 
-## Groups
+CLI tools go in the mise config so macOS and Ubuntu get the same versions; brew/apt is only for what mise can't provide.
 
-Packages are organized into groups. Selecting a group links all members together.
-
-| Group | Packages | What it sets up |
-|-------|----------|-----------------|
-| `shell` | shell, zsh, bash | zshrc, bashrc, shared aliases |
-| `starship` | starship | cross-shell prompt |
-| `tmux` | tmux | terminal multiplexer |
-| `dev` | mise, nvim | runtime version manager + editor |
-
-To change groupings, edit `lib/groups.sh`.
-
-## What gets installed
-
-| Group | Installed via |
-|-------|--------------|
-| shell | zsh, fzf, zoxide, zsh-syntax-highlighting, zsh-autosuggestions, bat, eza, fd, glow (binary) |
-| starship | curl from starship.rs |
-| tmux | tmux |
-| dev | neovim, ripgrep (apt), lazygit + mise (binaries) |
-
-## Backups
-
-Before symlinking, `lib/link.sh` moves any conflicting files into `.bak/<package>/`. Running `uninstall.sh` restores them.
+To add a config, put it in a folder that mirrors its path under `~`, and add that folder to `PACKAGES` in `bootstrap`.

@@ -1,3 +1,3 @@
 return {
-	{ "kevinhwang91/nvim-bqf", ft = "qf", opts = {} },
+    { "kevinhwang91/nvim-bqf", ft = "qf", opts = {} },
 }

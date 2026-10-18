@@ -10,14 +10,17 @@ return {
             local telescope = require("telescope")
             telescope.setup({
                 defaults = {
-                    file_ignore_patterns = {
-                        "node_modules", "vendor/", "tmp/", "log/",
-                        "%.git/", "%.lock", "%.png", "%.jpg", "%.jpeg",
-                        "%.gif", "%.min.js", "%.map", "public/assets",
-                    },
+                    -- rg and fd already skip .gitignore'd files
                     vimgrep_arguments = {
-                        "rg", "--color=never", "--no-heading", "--with-filename",
-                        "--line-number", "--column", "--smart-case", "--hidden", "--glob=!.git/",
+                        "rg",
+                        "--color=never",
+                        "--no-heading",
+                        "--with-filename",
+                        "--line-number",
+                        "--column",
+                        "--smart-case",
+                        "--hidden",
+                        "--glob=!.git/",
                     },
                     path_display = { "truncate" },
                 },
@@ -27,10 +30,10 @@ return {
             telescope.load_extension("live_grep_args")
         end,
         keys = {
-            { "<leader>sf", "<cmd>Telescope find_files<cr>",                desc = "Files" },
+            { "<leader>sf", "<cmd>Telescope find_files<cr>", desc = "Files" },
             { "<leader>sw", "<cmd>Telescope current_buffer_fuzzy_find<cr>", desc = "Word" },
-            { "<leader>sg", "<cmd>Telescope live_grep_args<cr>",            desc = "Grep" },
-            { "<leader>sb", "<cmd>Telescope buffers<cr>",                   desc = "Buffers" },
+            { "<leader>sg", "<cmd>Telescope live_grep_args<cr>", desc = "Grep" },
+            { "<leader>sb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
         },
     },
 }

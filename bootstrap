@@ -1,0 +1,230 @@
+#!/usr/bin/env bash
+# Install or uninstall these dotfiles: packages, config symlinks in ~, and mise tools.
+# Kept compatible with macOS's stock bash 3.2 so it runs on a fresh machine.
+set -eo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PACKAGES="shell zsh starship tmux mise nvim ghostty"
+# Everything install adds is recorded here so uninstall removes exactly that.
+STATE="$ROOT/.bak/installed"
+# apt packages this Ubuntu doesn't have; listed with install hints at the end
+SKIPPED=""
+
+if command -v brew >/dev/null; then
+  PM=brew
+elif command -v apt >/dev/null; then
+  PM=apt
+else
+  echo "Error: need Homebrew on macOS (https://brew.sh) or apt on Ubuntu" >&2
+  exit 1
+fi
+
+stow_cmd() {
+  stow --dir="$ROOT" --target="$HOME" --ignore='packages.*\.txt' "$@"
+}
+
+record() {
+  mkdir -p "$(dirname "$STATE")"
+  echo "$1" >>"$STATE"
+}
+
+recorded() {
+  if [ -f "$STATE" ]; then sed -n "s/^$1 //p" "$STATE" | tr '\n' ' '; fi
+}
+
+# ── Install ───────────────────────────────────────────────────────────────────
+
+# mise owns runtime activation; other managers fight it over PATH and shims.
+check_runtime_managers() {
+  local found=""
+  { command -v pyenv || [ -d "$HOME/.pyenv" ]; } >/dev/null && found="$found pyenv"
+  { command -v conda || [ -n "$CONDA_PREFIX$CONDA_EXE" ] || [ -d "$HOME/miniconda3" ] || [ -d "$HOME/anaconda3" ]; } >/dev/null && found="$found conda"
+  { [ -n "$NVM_DIR" ] || [ -d "$HOME/.nvm" ]; } && found="$found nvm"
+  { command -v asdf || [ -d "$HOME/.asdf" ]; } >/dev/null && found="$found asdf"
+  { command -v rbenv || [ -d "$HOME/.rbenv" ]; } >/dev/null && found="$found rbenv"
+  { command -v rvm || [ -d "$HOME/.rvm" ]; } >/dev/null && found="$found rvm"
+  [ -z "$found" ] && return
+  echo "Error: conflicting runtime managers detected:$found" >&2
+  echo "  Remove their shell startup hooks, then reload your shell and rerun ./bootstrap." >&2
+  exit 1
+}
+
+# stow, then entries from each package's packages.<pm>.txt, falling back to packages.txt.
+package_list() {
+  local pkg file
+  {
+    echo stow
+    for pkg in $PACKAGES; do
+      file="$ROOT/$pkg/packages.$PM.txt"
+      [ -f "$file" ] || file="$ROOT/$pkg/packages.txt"
+      if [ -f "$file" ]; then
+        sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e '/^#/d' -e '/^$/d' "$file"
+      fi
+    done
+  } | awk '!seen[$0]++'
+}
+
+install_packages() {
+  local missing="" p
+  for p in $(package_list); do
+    case "$PM" in
+      brew) brew list --formula "$p" >/dev/null 2>&1 || missing="$missing $p" ;;
+      apt)  dpkg -s "$p" >/dev/null 2>&1 || missing="$missing $p" ;;
+    esac
+  done
+  [ -z "$missing" ] && return
+  if [ "$PM" = apt ]; then
+    # Older Ubuntu lacks some packages (eza before 24.04); skip them instead of failing the whole install
+    sudo apt update
+    local available=""
+    for p in $missing; do
+      if apt-cache show "$p" >/dev/null 2>&1; then available="$available $p"; else SKIPPED="$SKIPPED $p"; fi
+    done
+    missing="$available"
+    [ -z "$missing" ] && return
+  fi
+  echo "Installing:$missing"
+  case "$PM" in
+    brew) HOMEBREW_NO_INSTALL_UPGRADE=1 HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 brew install $missing ;;
+    apt)  sudo apt install -y $missing ;;
+  esac
+  for p in $missing; do record "$PM $p"; done
+}
+
+# Tell the user how to get what apt didn't have
+print_skipped() {
+  local p
+  [ -z "$SKIPPED" ] && return
+  echo
+  echo "┌─ Not in apt on this Ubuntu, install by hand:"
+  for p in $SKIPPED; do
+    case "$p" in
+      eza) echo "│  eza: https://github.com/eza-community/eza/blob/main/INSTALL.md" ;;
+      *) echo "│  $p" ;;
+    esac
+  done
+  echo "└─"
+}
+
+# Move files that would block stow into .bak/<pkg>/ so uninstall can restore them.
+backup_conflicts() {
+  local pkg="$1" target
+  (cd "$ROOT/$pkg" && find . ! -type d ! -name 'packages*.txt' | sed 's|^\./||') |
+    while IFS= read -r target; do
+      [ -e "$HOME/$target" ] || [ -L "$HOME/$target" ] || continue
+      # -ef: already the same file, i.e. linked by an earlier install
+      [ "$HOME/$target" -ef "$ROOT/$pkg/$target" ] && continue
+      mkdir -p "$ROOT/.bak/$pkg/$(dirname "$target")"
+      mv "$HOME/$target" "$ROOT/.bak/$pkg/$target"
+      echo "  backed up: ~/$target -> .bak/$pkg/$target"
+    done
+}
+
+link_packages() {
+  local pkg
+  for pkg in $PACKAGES; do
+    backup_conflicts "$pkg"
+    stow_cmd "$pkg"
+    echo "  linked: $pkg"
+  done
+}
+
+# mise installs the languages and CLI tools listed in mise/.config/mise/config.toml
+install_mise() {
+  export PATH="$HOME/.local/bin:$PATH"
+  if ! command -v mise >/dev/null; then
+    curl -fsSL https://mise.run | sh
+    record mise
+  fi
+  mise install || echo "  warning: 'mise install' failed; rerun it later" >&2
+}
+
+use_zsh() {
+  [ "$(basename "$SHELL")" = zsh ] && return
+  echo "Switching your login shell to zsh"
+  chsh -s /bin/zsh
+}
+
+do_install() {
+  echo "OS: $(uname -s)  |  PM: $PM"
+  check_runtime_managers
+  install_packages
+  link_packages
+  install_mise
+  use_zsh
+  echo "Done. Open a new terminal."
+  print_skipped
+}
+
+# ── Uninstall ─────────────────────────────────────────────────────────────────
+
+restore_backups() {
+  local dir="$ROOT/.bak/$1" file rel
+  [ -d "$dir" ] || return 0
+  find "$dir" ! -type d | while IFS= read -r file; do
+    rel="${file#"$dir"/}"
+    mkdir -p "$HOME/$(dirname "$rel")"
+    mv "$file" "$HOME/$rel"
+    echo "  restored: ~/$rel"
+  done
+  rm -rf "$dir"
+}
+
+# Never remove the shell you log in with, even if install added it.
+keep() {
+  [ "$1" = "$(basename "${SHELL:-}")" ] && echo "  kept: $1 (your login shell)"
+}
+
+do_uninstall() {
+  local brew_pkgs apt_pkgs mise="" removing answer pkg p apt_remove=""
+  brew_pkgs="$(recorded brew)"
+  apt_pkgs="$(recorded apt)"
+  grep -qx mise "$STATE" 2>/dev/null && mise=1
+
+  removing="$brew_pkgs$apt_pkgs${mise:+mise (and every tool it installed) }"
+  echo "Unlinks every config and restores files moved into .bak/."
+  [ -n "$removing" ] && echo "Also removes what install added: $removing"
+  if [ -t 0 ]; then
+    printf "Continue? [y/N] "
+    read -r answer
+    case "$answer" in y | Y | yes) ;; *) echo "Cancelled."; return ;; esac
+  fi
+
+  for pkg in $PACKAGES; do
+    if stow_cmd -D "$pkg" 2>/dev/null; then
+      echo "  unlinked: $pkg"
+    else
+      echo "  (not linked: $pkg)"
+    fi
+    restore_backups "$pkg"
+  done
+
+  if [ -n "$mise" ]; then
+    "$HOME/.local/bin/mise" implode --yes && echo "  removed: mise"
+  fi
+  for p in $brew_pkgs; do
+    keep "$p" && continue
+    brew uninstall "$p" >/dev/null && echo "  removed: $p" || echo "  could not remove: $p" >&2
+  done
+  for p in $apt_pkgs; do keep "$p" || apt_remove="$apt_remove $p"; done
+  [ -z "$apt_remove" ] || { sudo apt remove -y $apt_remove && echo "  removed:$apt_remove"; }
+
+  rm -f "$STATE"
+  rmdir "$ROOT/.bak" 2>/dev/null || true
+  echo "Done. Open a new terminal."
+}
+
+# ── Menu ──────────────────────────────────────────────────────────────────────
+
+choice="$1"
+if [ -z "$choice" ]; then
+  printf "[i]nstall  [u]ninstall  [q]uit: "
+  read -r -n 1 choice || true
+  echo
+fi
+case "$choice" in
+  i) do_install ;;
+  u) do_uninstall ;;
+  q | "") exit 0 ;;
+  *) echo "Unknown choice: $choice" >&2; exit 1 ;;
+esac

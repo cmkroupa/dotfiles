@@ -1,46 +1,13 @@
 alias godot='cd ~/dotfiles'
 alias ..='cd ..'
 alias ...='cd ../..'
-command -v eza &>/dev/null && alias ls='eza --icons --group-directories-first --ignore-glob="*.tsbuildinfo|tsconfig.build.json|nest-cli.json|.eslintrc.js|.prettierrc"'
+command -v eza &>/dev/null && alias ls='eza --icons --group-directories-first'
 command -v eza &>/dev/null && alias ll='eza -la --icons --group-directories-first --git'
-function cat() {
-  if [[ $# -eq 1 && "$1" == *.md ]] && command -v glow &>/dev/null; then
-    glow "$1"
-  elif command -v bat &>/dev/null; then
-    bat --paging=never "$@"
-  else
-    command cat "$@"
-  fi
-}
+
+alias cat='bat --paging=never'
 alias v='nvim'
-alias g='git'
-alias gst='git status'
-alias gcm='git commit -m'
-alias gph='git push'
-alias gsw='git switch'
 alias rg='rg --smart-case'
 alias path='echo $PATH | tr ":" "\n"'
-alias aliases='command bat --language=bash --style=plain --paging=never ~/.config/shell/aliases 2>/dev/null || command cat ~/.config/shell/aliases'
+alias redot='source ~/.zshrc'
 
-function glg() { git log --oneline --graph --decorate -${1:-20}; }
 function mkcd() { mkdir -p "$1" && cd "$1"; }
-function reload() {
-  [[ -n "$ZSH_VERSION" ]]  && source ~/.zshrc  && return
-  [[ -n "$BASH_VERSION" ]] && source ~/.bashrc && return
-}
-alias ccgen='python3 tests/clang/compile_commands_factory.py core compile_commands.json && ln -sf "$(pwd)/compile_commands.json" ~/dotfiles/compile_commands.json'
-uncrust() {
-  [[ $# -eq 0 ]] && { echo "usage: uncrust <file>"; return 1; }
-  command -v clang-format &>/dev/null || { echo "uncrust: clang-format not found"; return 1; }
-  local root; root=$(git rev-parse --show-toplevel 2>/dev/null)
-  local style="file"
-  [[ -n "$root" && -f "$root/tools/git_hooks/.clang-format" ]] && style="file:$root/tools/git_hooks/.clang-format"
-  for f in "$@"; do
-    local ext="${f##*.}"
-    case "$ext" in
-      c|h|cpp|hpp|tcc|ipp) ;;
-      *) echo "uncrust: unsupported extension: $f"; continue ;;
-    esac
-    clang-format -i --style="$style" "$f" && echo "formatted: $f"
-  done
-}

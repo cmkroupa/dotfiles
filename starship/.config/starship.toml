@@ -1,6 +1,5 @@
-format = "$username$hostname $directory${custom.git_dirty}${custom.git_ahead}${custom.git_clean} $character"
+format = "$username$hostname $directory$git_branch$git_status $character"
 add_newline = false
-command_timeout = 2000
 
 [username]
 show_always = true
@@ -19,29 +18,15 @@ truncation_length = 4
 truncate_to_repo = false
 format = "[$path]($style)[$read_only]($read_only_style)"
 
-[custom.git_dirty]
-command = "git branch --show-current"
-when = 'git rev-parse --is-inside-work-tree &>/dev/null && git status --no-optional-locks --porcelain 2>/dev/null | grep -q .'
-ignore_timeout = true
-style = "bold red"
-format = "[ $output]($style)"
-
-[custom.git_ahead]
-command = "git branch --show-current"
-when = 'git rev-parse --is-inside-work-tree &>/dev/null && git rev-list "@{upstream}..HEAD" 2>/dev/null | grep -q .'
-ignore_timeout = true
-style = "bold yellow"
-format = "[ $output]($style)"
-
-[custom.git_clean]
-command = "git branch --show-current"
-when = 'git rev-parse --is-inside-work-tree &>/dev/null && ! git status --no-optional-locks --porcelain 2>/dev/null | grep -q . && ! git rev-list "@{upstream}..HEAD" 2>/dev/null | grep -q .'
-ignore_timeout = true
+[git_branch]
+format = " [$symbol$branch]($style)"
 style = "bold green"
-format = "[ $output]($style)"
+
+# ! modified  + staged  ? untracked  ✘ deleted  $ stashed  ⇡ ahead  ⇣ behind
+[git_status]
+format = "[ $all_status$ahead_behind]($style)"
+style = "bold red"
 
 [character]
 success_symbol = "[❯](bold green)"
 error_symbol = "[❯](bold red)"
-
-

@@ -1,0 +1,7 @@
+# Cheat sheet of tmux shortcuts, from the -N notes in ~/.tmux.conf
+function keys() {
+  echo "Anywhere"
+  tmux start-server \; list-keys -N -T root | sed 's/^M-/  ⌥ /'
+  echo "Copy mode (scroll up, or Ctrl-b [)"
+  tmux start-server \; list-keys -N -T copy-mode-vi | sed 's/^/  /'
+}

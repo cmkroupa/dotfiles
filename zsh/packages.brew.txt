@@ -1,0 +1,3 @@
+# macOS already ships zsh
+zsh-syntax-highlighting
+zsh-autosuggestions

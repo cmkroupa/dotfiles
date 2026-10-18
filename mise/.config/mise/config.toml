@@ -1,7 +1,18 @@
 [tools]
+# Languages
 node = "lts"
 pnpm = "latest"
 python = "latest"
+ruby = "latest"
+"gem:rails" = "latest"
 lua = "latest"
-go = "latest"
-# tmux managed by system (mise shims break on WSL with no tty)
+
+# CLI tools: same versions on macOS and Ubuntu, newer than apt's
+neovim = "latest"
+fzf = "latest"
+ripgrep = "latest"
+fd = "latest"
+bat = "latest"
+zoxide = "latest"
+starship = "latest"
+lazygit = "latest"

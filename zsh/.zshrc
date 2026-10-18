@@ -5,7 +5,8 @@ SAVEHIST=10000
 setopt HIST_IGNORE_ALL_DUPS SHARE_HISTORY
 
 # ── Path ──────────────────────────────────────────────────────────────────────
-[[ -d "$HOME/.local/bin" ]] && export PATH="$HOME/.local/bin:$PATH"
+typeset -U path PATH
+path=("$HOME/.local/bin" $path)
 
 # ── Completions ───────────────────────────────────────────────────────────────
 autoload -Uz compinit && compinit
@@ -15,32 +16,22 @@ zle -N down-line-or-beginning-search
 bindkey "^[[A" up-line-or-beginning-search
 bindkey "^[[B" down-line-or-beginning-search
 
-# ── Plugins ───────────────────────────────────────────────────────────────────
-_source_plugin() {
-  local name="$1" file="$1.zsh"
-  local -a candidates=(
-    "/usr/share/$name/$file"
-    "/usr/share/zsh/plugins/$name/$file"
-    "/usr/share/zsh-$name/$file"
-    "/opt/homebrew/share/$name/$file"
-  )
-  for p in "${candidates[@]}"; do [[ -f "$p" ]] && source "$p" && return; done
-}
-_source_plugin zsh-syntax-highlighting
-_source_plugin zsh-autosuggestions
-
 # ── Tools ─────────────────────────────────────────────────────────────────────
-[[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
-[[ -d "$HOME/.local/share/mise/shims" ]] && export PATH="$HOME/.local/share/mise/shims:$PATH"
+# mise first: it provides fzf, nvim and the language runtimes
+command -v mise &>/dev/null && eval "$(mise activate zsh)"
+command -v fzf &>/dev/null && source <(fzf --zsh)
 command -v starship &>/dev/null && eval "$(starship init zsh)"
+command -v zoxide &>/dev/null && eval "$(zoxide init zsh --cmd cd)"
 
 # ── Aliases ───────────────────────────────────────────────────────────────────
 [[ -f ~/.config/shell/aliases ]] && source ~/.config/shell/aliases
+[[ -f ~/.config/shell/functions ]] && source ~/.config/shell/functions
 
-
-# Added by Antigravity CLI installer
-export PATH="/Users/camk/.local/bin:$PATH"
-
-# Zoxide
-command -v zoxide  &>/dev/null && eval "$(zoxide init zsh --cmd cd)"
-
+# ── Plugins (Homebrew or apt) ─────────────────────────────────────────────────
+# syntax-highlighting goes last so it sees every widget defined above
+for plugin in zsh-autosuggestions zsh-syntax-highlighting; do
+  for dir in /opt/homebrew/share /usr/share; do
+    [[ -f $dir/$plugin/$plugin.zsh ]] && source $dir/$plugin/$plugin.zsh && break
+  done
+done
+unset plugin dir

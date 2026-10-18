@@ -1,0 +1,8 @@
+# mise downloads with curl and builds Ruby from source on Linux
+curl
+build-essential
+libssl-dev
+libyaml-dev
+zlib1g-dev
+libffi-dev
+libreadline-dev
