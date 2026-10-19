@@ -1,8 +1,6 @@
 # ── Ghostty Configuration ─────────────────────────────────────────────────────
 
-# Neovim's theme switcher overwrites active_theme; ? = fine if it doesn't exist yet
 theme = Catppuccin Macchiato
-config-file = ?active_theme
 # login shell so tmux is found on PATH (Homebrew on macOS, /usr/bin on Ubuntu)
 initial-command = /bin/zsh -lc tmux
 
@@ -25,3 +23,6 @@ copy-on-select = true
 
 # Quick terminal: drops down from the top from any app (macOS asks for Accessibility permission once)
 keybind = global:ctrl+grave_accent=toggle_quick_terminal
+
+# ⌥r reloads Ghostty too; unconsumed passes the key on so tmux still reloads itself and zsh
+keybind = unconsumed:alt+r=reload_config

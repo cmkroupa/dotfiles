@@ -7,6 +7,7 @@ return {
         "htmx",
         "emmet_ls",
         "bashls",
+        "ruff",
         "neocmake",
         "autotools_ls",
     },

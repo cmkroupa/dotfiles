@@ -50,6 +50,42 @@ return {
         },
     },
     { "folke/trouble.nvim", opts = {} },
+    -- Files: `-` opens the current folder as a plain list of names you edit like text; g? shows how
+    {
+        "stevearc/oil.nvim",
+        lazy = false,
+        keys = {
+            { "<leader>e", "<cmd>Oil<cr>", desc = "Explore files (new, rename, move, delete)" },
+        },
+        opts = {
+            columns = {}, -- just names, no icons
+            -- Only deletes ask for confirmation; new files, renames and moves just happen
+            skip_confirm_for_simple_edits = true,
+            view_options = { show_hidden = true },
+            keymaps = {
+                q = "actions.close",
+                ["g?"] = {
+                    desc = "Help",
+                    callback = function()
+                        vim.lsp.util.open_floating_preview({
+                            "Enter   open file or folder",
+                            "-       up a folder",
+                            "q       close",
+                            "",
+                            "o       new file: type a name",
+                            "        end it with / for a folder",
+                            "        a/b.c also creates folder a",
+                            "dd      delete",
+                            "cw      rename",
+                            "dd, p   move: cut here, paste in another folder",
+                            "",
+                            ":w      apply changes (u undoes before that)",
+                        }, "text", { border = "rounded", title = " files " })
+                    end,
+                },
+            },
+        },
+    },
     { "christoomey/vim-tmux-navigator", lazy = false },
     {
         "nvim-treesitter/nvim-treesitter",

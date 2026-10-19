@@ -23,14 +23,9 @@ return {
             vim.lsp.config("clangd", {
                 cmd = { "clangd", "--clang-tidy" },
             })
-            -- shellcheck and shfmt already run through nvim-lint and conform
+            -- shfmt already runs through conform; shellcheck runs inside bashls so its fixes show up for Space f
             vim.lsp.config("bashls", {
-                settings = {
-                    bashIde = {
-                        shellcheckPath = "",
-                        shfmt = { path = "" },
-                    },
-                },
+                settings = { bashIde = { shfmt = { path = "" } } },
             })
             vim.lsp.config("lua_ls", {
                 settings = {
@@ -44,44 +39,42 @@ return {
 
             vim.lsp.enable(servers.mason_lsp)
 
-            -- Drop Neovim's default gr* LSP maps so gr (references) fires without waiting
+            -- Drop Neovim's default gr* LSP keys (rename, actions, ...): every command lives under Space
             for _, k in ipairs({ "grn", "grr", "gri", "grt" }) do
                 pcall(vim.keymap.del, "n", k)
             end
             pcall(vim.keymap.del, { "n", "x" }, "gra")
 
-            vim.api.nvim_create_autocmd("LspAttach", {
-                callback = function(args)
-                    local map = vim.keymap.set
-                    local opts = { buffer = args.buf }
-                    local ext = function(desc)
-                        return vim.tbl_extend("force", opts, { desc = desc })
+            -- Space d: where is this defined; Space r: where is this used. Same in every language.
+            -- In files with no language server they say so instead of doing nothing.
+            local function picker(name)
+                return function()
+                    if #vim.lsp.get_clients({ bufnr = 0 }) == 0 then
+                        vim.notify("No language server for this file", vim.log.levels.WARN)
+                        return
                     end
+                    require("telescope.builtin")[name]()
+                end
+            end
+            vim.keymap.set("n", "<leader>d", picker("lsp_definitions"), { desc = "Definition" })
+            vim.keymap.set("n", "<leader>r", picker("lsp_references"), { desc = "References" })
 
-                    vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
-
-                    map("n", "gd", function()
-                        require("telescope.builtin").lsp_definitions()
-                    end, ext("Go to Definition"))
-                    map("n", "gD", vim.lsp.buf.declaration, ext("Go to Declaration"))
-                    map("n", "gi", function()
-                        require("telescope.builtin").lsp_implementations()
-                    end, ext("Go to Implementation"))
-                    map("n", "gr", function()
-                        require("telescope.builtin").lsp_references()
-                    end, ext("Go to References"))
-                    if vim.lsp.get_client_by_id(args.data.client_id).name == "clangd" then
-                        map("n", "gh", "<cmd>LspClangdSwitchSourceHeader<cr>", ext("Switch Source/Header"))
-                    end
-                    map("n", "<leader>i", vim.lsp.buf.hover, ext("Hover Info"))
-                    map("n", "<leader>ti", function()
-                        vim.lsp.inlay_hint.enable(
-                            not vim.lsp.inlay_hint.is_enabled({ bufnr = args.buf }),
-                            { bufnr = args.buf }
-                        )
-                    end, ext("Toggle Inlay Hints"))
-                end,
-            })
+            -- Apply the suggested fix for the problem under the cursor. Servers list the real fix
+            -- first and "disable this rule" options after it, so take the first one.
+            vim.keymap.set("n", "<leader>f", function()
+                local taken = false
+                vim.lsp.buf.code_action({
+                    context = { only = { "quickfix" } },
+                    filter = function()
+                        if taken then
+                            return false
+                        end
+                        taken = true
+                        return true
+                    end,
+                    apply = true,
+                })
+            end, { desc = "Fix error" })
         end,
     },
 }

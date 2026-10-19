@@ -14,9 +14,6 @@ end
 
 local linters_by_ft = {
     cmake = { "cmake_lint" },
-    python = { "ruff" },
-    sh = { "shellcheck" },
-    bash = { "shellcheck" },
     json = { "jsonlint" },
     yaml = { "yamllint" },
     markdown = { "markdownlint-cli2" },
@@ -30,11 +27,11 @@ return {
         cmd = "ConformInfo",
         keys = {
             {
-                "<leader>u",
+                "<leader>=",
                 function()
                     require("conform").format({ lsp_format = "fallback", timeout_ms = 5000 })
                 end,
-                desc = "Format buffer",
+                desc = "Format",
             },
         },
         opts = {

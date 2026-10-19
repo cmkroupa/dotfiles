@@ -1,5 +1,3 @@
 .claude/
 .bak/
-# written by the Neovim theme switcher
-ghostty/.config/ghostty/active_theme
 *.log

@@ -1,15 +1,12 @@
 return {
-    -- Colorschemes load on demand: lazy.nvim pulls one in when :colorscheme names it
-    { "catppuccin/nvim", name = "catppuccin", lazy = true, opts = {} },
-    { "folke/tokyonight.nvim", lazy = true },
-    { "rebelot/kanagawa.nvim", lazy = true },
-    { "ellisonleao/gruvbox.nvim", lazy = true },
-    { "rose-pine/neovim", name = "rose-pine", lazy = true },
-    { "navarasu/onedark.nvim", lazy = true },
-    { "EdenEast/nightfox.nvim", lazy = true },
-    { "sainnhe/everforest", lazy = true },
-    { "Mofiqul/dracula.nvim", lazy = true },
-    { "projekt0n/github-nvim-theme", lazy = true },
+    {
+        "catppuccin/nvim",
+        name = "catppuccin",
+        priority = 1000,
+        config = function()
+            vim.cmd.colorscheme("catppuccin-macchiato")
+        end,
+    },
     {
         "akinsho/bufferline.nvim",
         version = "*",
@@ -59,18 +56,14 @@ return {
     {
         "folke/which-key.nvim",
         opts = {
-            win = { height = { min = 3, max = 8 } },
-            spec = {
-                { "<leader>s", group = "Search" },
-                { "<leader>p", group = "Pins", icon = { icon = "󰐃", color = "cyan" } },
-                { "<leader>t", group = "Toggle", hidden = true },
-                { "<leader>`", hidden = true },
-                { "gz", group = "Surround" },
-                { "[", group = "Prev" },
-                { "]", group = "Next" },
-                { "a", group = "Around", mode = { "o", "x" } },
-                { "i", group = "Inside", mode = { "o", "x" } },
-            },
+            preset = "helix",
+            icons = { mappings = false }, -- plain words, no icons next to each key
+            -- Only pop up after <leader>; g, z, [, ], registers etc. stay quiet
+            triggers = { { "<leader>", mode = { "n", "x" } } },
+            -- Hide plugin internals: only mappings with a description show
+            filter = function(m)
+                return m.desc and m.desc ~= ""
+            end,
         },
     },
 }
