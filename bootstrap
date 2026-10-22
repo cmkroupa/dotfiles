@@ -21,12 +21,18 @@ elif command -v apt >/dev/null; then
 elif command -v dnf >/dev/null; then
     PM=dnf
 else
-    echo "Error: need Homebrew on macOS (https://brew.sh) apt on Ubuntu or dnf on Fedora" >&2
+    echo "Error: need Homebrew on macOS (https://brew.sh), apt on Ubuntu or dnf on Fedora" >&2
     exit 1
 fi
 
+# Print a command, then run it, like any installer
+run() {
+    printf '+ %s\n' "$*"
+    "$@"
+}
+
 stow_cmd() {
-    stow --dir="$ROOT" --target="$HOME" --ignore='packages.*\.txt' "$@"
+    run stow --dir="$ROOT" --target="$HOME" --ignore='packages.*\.txt' "$@"
 }
 
 record() {
@@ -90,7 +96,7 @@ install_packages() {
     [ -z "$missing" ] && return
     if [ "$PM" != brew ]; then
         # Older Ubuntu lacks some packages (eza before 24.04); skip them instead of failing the whole install
-        [ "$PM" = apt ] && sudo apt update
+        [ "$PM" = apt ] && run sudo apt update
         local available=""
         for p in $missing; do
             if pm_has "$p"; then available="$available $p"; else SKIPPED="$SKIPPED $p"; fi
@@ -100,9 +106,9 @@ install_packages() {
     fi
     echo "Installing:$missing"
     case "$PM" in
-    brew) HOMEBREW_NO_INSTALL_UPGRADE=1 HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 brew install $missing ;;
-    apt) sudo apt install -y $missing ;;
-    dnf) sudo dnf install -y $missing ;;
+    brew) run env HOMEBREW_NO_INSTALL_UPGRADE=1 HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 brew install $missing ;;
+    apt) run sudo apt install -y $missing ;;
+    dnf) run sudo dnf install -y $missing ;;
     esac
     for p in $missing; do record "$PM $p"; done
 }
@@ -131,8 +137,7 @@ backup_conflicts() {
             # -ef: already the same file, i.e. linked by an earlier install
             [ "$HOME/$target" -ef "$ROOT/$pkg/$target" ] && continue
             mkdir -p "$ROOT/.bak/$pkg/$(dirname "$target")"
-            mv "$HOME/$target" "$ROOT/.bak/$pkg/$target"
-            echo "  backed up: ~/$target -> .bak/$pkg/$target"
+            run mv "$HOME/$target" "$ROOT/.bak/$pkg/$target"
         done
 }
 
@@ -149,10 +154,11 @@ link_packages() {
 install_mise() {
     export PATH="$HOME/.local/bin:$PATH"
     if ! command -v mise >/dev/null; then
+        echo "+ curl -fsSL https://mise.run | sh"
         curl -fsSL https://mise.run | sh
         record mise
     fi
-    mise install || echo "  warning: 'mise install' failed; rerun it later" >&2
+    run mise install || echo "  warning: 'mise install' failed; rerun it later" >&2
 }
 
 # Docker needs the daemon reachable: a docker group on Linux, a colima VM on macOS.
@@ -160,8 +166,8 @@ setup_docker() {
     case " $PACKAGES " in *" docker "*) ;; *) return ;; esac
     if [ "$PM" != brew ]; then
         # Fedora's moby-engine ships a disabled daemon; Ubuntu's docker.io starts itself
-        [ "$PM" = dnf ] && sudo systemctl enable --now docker
-        sudo usermod -aG docker "$USER" && echo "  added $USER to the docker group (log out and back in)"
+        [ "$PM" = dnf ] && run sudo systemctl enable --now docker
+        run sudo usermod -aG docker "$USER" && echo "  log out and back in for the docker group"
     else
         echo "  start Docker with: colima start"
     fi
@@ -196,7 +202,7 @@ restore_backups() {
     find "$dir" ! -type d | while IFS= read -r file; do
         rel="${file#"$dir"/}"
         mkdir -p "$HOME/$(dirname "$rel")"
-        mv "$file" "$HOME/$rel"
+        run mv "$file" "$HOME/$rel"
         echo "  restored: ~/$rel"
     done
     rm -rf "$dir"
@@ -237,17 +243,17 @@ do_uninstall() {
     done
 
     if [ -n "$mise" ]; then
-        "$HOME/.local/bin/mise" implode --yes && echo "  removed: mise"
+        run "$HOME/.local/bin/mise" implode --yes && echo "  removed: mise"
     fi
     for p in $brew_pkgs; do
         keep "$p" && continue
-        brew uninstall "$p" >/dev/null && echo "  removed: $p" || echo "  could not remove: $p" >&2
+        run brew uninstall "$p" && echo "  removed: $p" || echo "  could not remove: $p" >&2
     done
     for p in $apt_pkgs; do keep "$p" || apt_remove="$apt_remove $p"; done
     local dnf_remove=""
     for p in $dnf_pkgs; do keep "$p" || dnf_remove="$dnf_remove $p"; done
-    [ -z "$dnf_remove" ] || { sudo dnf remove -y $dnf_remove && echo "  removed:$dnf_remove"; }
-    [ -z "$apt_remove" ] || { sudo apt remove -y $apt_remove && echo "  removed:$apt_remove"; }
+    [ -z "$dnf_remove" ] || { run sudo dnf remove -y $dnf_remove && echo "  removed:$dnf_remove"; }
+    [ -z "$apt_remove" ] || { run sudo apt remove -y $apt_remove && echo "  removed:$apt_remove"; }
 
     rm -f "$STATE"
     rmdir "$ROOT/.bak" 2>/dev/null || true
