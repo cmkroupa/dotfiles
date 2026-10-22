@@ -5,7 +5,7 @@ set -eo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Each folder is a stow package and may hold a packages.<pm>.txt. Headless installs the first
-# set; install adds languages (pnpm, python, ruby, lua + build libraries), docker and ghostty.
+# set; install adds languages (bun, python, ruby, lua + build libraries), docker and ghostty.
 TERMINAL_PACKAGES="shell zsh starship tmux mise nvim"
 ALL_PACKAGES="$TERMINAL_PACKAGES languages docker ghostty"
 PACKAGES="$ALL_PACKAGES"
@@ -171,7 +171,7 @@ menu() {
     cat <<'MENU'
   [h] headless   terminal tools only: zsh, tmux, neovim, starship, fzf, ripgrep, fd, bat,
                  zoxide, lazygit, eza, btop, node
-  [i] install    everything in headless, plus pnpm, python, ruby + rails, lua,
+  [i] install    everything in headless, plus bun, python, ruby + rails, lua,
                  docker + lazydocker, and the ghostty config
   [u] uninstall  unlink configs, restore .bak/, remove what install added
   [q] quit

@@ -15,7 +15,7 @@ Needs Homebrew on macOS, apt on Ubuntu or dnf on Fedora. On Ubuntu before 24.04,
 | Choice | Does |
 |--------|------|
 | `h` headless | terminal tools only: zsh + plugins, starship, tmux, eza, btop, mise, node, neovim, fzf, ripgrep, fd, bat, zoxide, lazygit |
-| `i` install | everything in headless, plus pnpm, python, ruby + rails, lua, Docker (+ lazydocker) and the Ghostty config |
+| `i` install | everything in headless, plus bun, python, ruby + rails, lua, Docker (+ lazydocker) and the Ghostty config |
 | `u` uninstall | see below |
 
 **Install** (`h` or `i`):
@@ -39,7 +39,7 @@ It's safe to rerun. Everything it installs is recorded in `.bak/installed`.
 | `tmux` | `.tmux.conf` | tmux |
 | `mise` | CLI tools | mise, then `mise/.config/mise/config.toml`: node, neovim, fzf, ripgrep, fd, bat, zoxide, starship, lazygit |
 | `nvim` | neovim config | Linux only: build tools, unzip and wl-clipboard |
-| `languages` | python packages, mise languages (`i` only) | pnpm, python, ruby + rails, lua; Linux build libraries |
+| `languages` | python packages, mise languages (`i` only) | bun, python, ruby + rails, lua; Linux build libraries |
 | `docker` | mise's lazydocker (`i` only) | docker, docker-compose, colima (macOS); docker.io, docker-compose-v2 (Ubuntu); moby-engine, docker-compose (Fedora) |
 | `ghostty` | terminal emulator (`i` only) | config only |
 
