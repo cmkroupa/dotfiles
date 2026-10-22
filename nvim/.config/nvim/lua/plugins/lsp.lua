@@ -17,9 +17,8 @@ return {
         "neovim/nvim-lspconfig",
         dependencies = { "williamboman/mason-lspconfig.nvim" },
         config = function()
-            vim.lsp.config("emmet_ls", { filetypes = { "html" } })
-            vim.lsp.config("htmx", { filetypes = { "html" } })
-            vim.lsp.config("html", { init_options = { provideFormatter = false } })
+            -- Stimulus only matters where data-controller attributes live
+            vim.lsp.config("stimulus_ls", { filetypes = { "html", "eruby" } })
             vim.lsp.config("clangd", {
                 cmd = { "clangd", "--clang-tidy" },
             })
@@ -59,12 +58,14 @@ return {
             vim.keymap.set("n", "<leader>d", picker("lsp_definitions"), { desc = "Definition" })
             vim.keymap.set("n", "<leader>r", picker("lsp_references"), { desc = "References" })
 
-            -- Apply the suggested fix for the problem under the cursor. Servers list the real fix
-            -- first and "disable this rule" options after it, so take the first one.
-            vim.keymap.set("n", "<leader>f", function()
+            -- Right-click a problem > "Fix error" applies the suggested fix for that line. Servers list
+            -- the real fix first and "disable this rule" options after it, so take the first one.
+            vim.api.nvim_create_user_command("FixError", function()
                 local taken = false
+                local row = vim.api.nvim_win_get_cursor(0)[1]
                 vim.lsp.buf.code_action({
                     context = { only = { "quickfix" } },
+                    range = { start = { row, 0 }, ["end"] = { row, #vim.api.nvim_get_current_line() } },
                     filter = function()
                         if taken then
                             return false
@@ -75,6 +76,18 @@ return {
                     apply = true,
                 })
             end, { desc = "Fix error" })
+
+            -- Right-click menu: only these, in place of Neovim's default list
+            pcall(vim.api.nvim_del_augroup_by_name, "nvim.popupmenu")
+            vim.cmd([[
+                aunmenu PopUp
+                nnoremenu PopUp.Fix\ error <Cmd>FixError<CR>
+                nnoremenu PopUp.Definition <Cmd>Telescope lsp_definitions<CR>
+                nnoremenu PopUp.References <Cmd>Telescope lsp_references<CR>
+                vnoremenu PopUp.Cut "+x
+                vnoremenu PopUp.Copy "+y
+                anoremenu PopUp.Paste "+gP
+            ]])
         end,
     },
 }

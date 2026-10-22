@@ -3,13 +3,17 @@ return {
         "pyright",
         "clangd",
         "lua_ls",
-        "html",
-        "htmx",
-        "emmet_ls",
         "bashls",
         "ruff",
         "neocmake",
         "autotools_ls",
+        -- Rails
+        "ruby_lsp",
+        "herb_ls",
+        "ts_ls",
+        "stimulus_ls",
+        -- PHP
+        "intelephense",
     },
     mason_tools = {
         "tree-sitter-cli",

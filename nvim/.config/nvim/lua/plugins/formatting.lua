@@ -2,13 +2,14 @@ local formatters_by_ft = {
     c = { "clang_format" },
     cpp = { "clang_format" },
     cmake = { "cmake_format" },
-    python = { "ruff_format" },
+    python = { "ruff_fix", "ruff_organize_imports", "ruff_format" },
     sh = { "shfmt" },
     bash = { "shfmt" },
     lua = { "stylua" },
+    javascript = { "prettierd" },
 }
 
-for _, ft in ipairs({ "json", "jsonc", "html", "yaml", "markdown" }) do
+for _, ft in ipairs({ "json", "jsonc", "html", "yaml", "markdown", "css", "typescript" }) do
     formatters_by_ft[ft] = { "prettierd" }
 end
 
@@ -25,6 +26,39 @@ return {
         "stevearc/conform.nvim",
         event = "BufWritePre",
         cmd = "ConformInfo",
+        init = function()
+            -- Format on paste (like VS Code): reformat just the pasted range
+            local paste = vim.paste
+            vim.paste = function(lines, phase)
+                local ret = paste(lines, phase)
+                if (phase == -1 or phase == 3) and vim.bo.buftype == "" and vim.bo.modifiable then
+                    local buf = vim.api.nvim_get_current_buf()
+                    vim.schedule(function()
+                        if not vim.api.nvim_buf_is_valid(buf) then
+                            return
+                        end
+                        local s = vim.api.nvim_buf_get_mark(buf, "[")[1]
+                        local e = vim.api.nvim_buf_get_mark(buf, "]")[1]
+                        if s < 1 or e < s or e > vim.api.nvim_buf_line_count(buf) then
+                            return
+                        end
+                        local last = vim.api.nvim_buf_get_lines(buf, e - 1, e, false)[1] or ""
+                        require("conform").format({
+                            bufnr = buf,
+                            async = true,
+                            lsp_format = "fallback",
+                            range = { start = { s, 0 }, ["end"] = { e, #last } },
+                        })
+                    end)
+                end
+                return ret
+            end
+
+            -- Format on type (LSP servers that support it)
+            if vim.lsp.on_type_formatting then
+                vim.lsp.on_type_formatting.enable()
+            end
+        end,
         keys = {
             {
                 "<leader>=",

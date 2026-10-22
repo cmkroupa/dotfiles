@@ -15,6 +15,10 @@ local parsers = {
     "bash",
     "make",
     "cmake",
+    "ruby",
+    "embedded_template", -- ERB
+    "javascript",
+    "php",
 }
 
 -- nvim-treesitter-textobjects (main branch) has no keymap config; maps are set by hand

@@ -29,6 +29,12 @@ vim.diagnostic.config({
 })
 vim.cmd("runtime macros/matchit.vim")
 
+-- JS and HTML use 2 spaces by convention (Ruby and ERB already get 2 from Neovim)
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "javascript", "html" },
+    command = "setlocal shiftwidth=2 tabstop=2",
+})
+
 -- Strip trailing whitespace on save
 vim.api.nvim_create_autocmd("BufWritePre", {
     group = vim.api.nvim_create_augroup("UserTrimWhitespace", { clear = true }),
