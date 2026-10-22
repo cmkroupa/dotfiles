@@ -159,6 +159,21 @@ install_mise() {
         record mise
     fi
     run mise install || echo "  warning: 'mise install' failed; rerun it later" >&2
+    install_tree_sitter
+}
+
+# nvim-treesitter needs tree-sitter-cli 0.26.1+, whose prebuilt Linux binary wants glibc 2.39
+# (Ubuntu 24.04+). On older distros (Rocky/RHEL 9, Ubuntu 22.04) build it from source instead.
+install_tree_sitter() {
+    [ "$(uname -s)" = Linux ] || return 0
+    local glibc
+    glibc="$(ldd --version 2>/dev/null | head -n1 | grep -o '[0-9][0-9.]*$')"
+    [ -z "$glibc" ] && return 0
+    [ "$(printf '%s\n2.39\n' "$glibc" | sort -V | head -n1)" = 2.39 ] && return 0
+    [ -x "$HOME/.local/bin/tree-sitter" ] && return 0
+    echo "glibc $glibc is too old for the prebuilt tree-sitter-cli; building it (a few minutes)"
+    run mise exec rust@latest -- cargo install --locked --root "$HOME/.local" tree-sitter-cli
+    record tree-sitter
 }
 
 # Docker needs the daemon reachable: a docker group on Linux, a colima VM on macOS.
@@ -242,6 +257,9 @@ do_uninstall() {
         restore_backups "$pkg"
     done
 
+    if grep -qx tree-sitter "$STATE" 2>/dev/null; then
+        run rm -f "$HOME/.local/bin/tree-sitter" "$HOME/.local/.crates.toml" "$HOME/.local/.crates2.json"
+    fi
     if [ -n "$mise" ]; then
         run "$HOME/.local/bin/mise" implode --yes && echo "  removed: mise"
     fi

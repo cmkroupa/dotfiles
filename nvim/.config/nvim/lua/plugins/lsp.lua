@@ -1,7 +1,8 @@
 local servers = require("config.lsp_servers")
 
 return {
-    { "williamboman/mason.nvim", opts = {} },
+    -- Mason's bin dir goes last so a tree-sitter built by bootstrap beats its glibc-2.39-only binary
+    { "williamboman/mason.nvim", opts = { PATH = "append" } },
     {
         "WhoIsSethDaniel/mason-tool-installer.nvim",
         dependencies = { "williamboman/mason.nvim" },
