@@ -4,11 +4,11 @@
 set -eo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ALL_PACKAGES="shell zsh starship tmux mise nvim ghostty"
-# Profiles: full = everything; terminal = shell, tmux, mise tools and nvim, no GUI or Docker.
+# Each folder is a stow package and may hold a packages.<pm>.txt. Terminal installs the first
+# set; full adds languages (pnpm, python, ruby, lua + build libraries), docker and ghostty.
+TERMINAL_PACKAGES="shell zsh starship tmux mise nvim"
+ALL_PACKAGES="$TERMINAL_PACKAGES languages docker ghostty"
 PACKAGES="$ALL_PACKAGES"
-# Dirs that only hold package lists (nothing to stow)
-EXTRA_LISTS="docker"
 # Everything install adds is recorded here so uninstall removes exactly that.
 STATE="$ROOT/.bak/installed"
 # apt/dnf packages this Linux doesn't have; listed with install hints at the end
@@ -60,7 +60,7 @@ package_list() {
     local pkg file
     {
         echo stow
-        for pkg in $PACKAGES $EXTRA_LISTS; do
+        for pkg in $PACKAGES; do
             file="$ROOT/$pkg/packages.$PM.txt"
             [ -f "$file" ] || file="$ROOT/$pkg/packages.txt"
             if [ -f "$file" ]; then
@@ -157,7 +157,7 @@ install_mise() {
 
 # Docker needs the daemon reachable: a docker group on Linux, a colima VM on macOS.
 setup_docker() {
-    case " $EXTRA_LISTS " in *" docker "*) ;; *) return ;; esac
+    case " $PACKAGES " in *" docker "*) ;; *) return ;; esac
     if [ "$PM" != brew ]; then
         # Fedora's moby-engine ships a disabled daemon; Ubuntu's docker.io starts itself
         [ "$PM" = dnf ] && sudo systemctl enable --now docker
@@ -167,28 +167,24 @@ setup_docker() {
     fi
 }
 
-choose_profile() {
-    local profile="$1"
-    if [ -z "$profile" ]; then
-        printf "Profile: [f]ull  [t]erminal only (no ghostty or docker): "
-        read -r -n 1 profile || true
-        echo
-    fi
-    case "$profile" in
-    f | full | "") ;;
-    t | terminal)
-        PACKAGES="shell zsh starship tmux mise nvim"
-        EXTRA_LISTS=""
-        ;;
-    *)
-        echo "Unknown profile: $profile" >&2
-        exit 1
-        ;;
-    esac
+menu() {
+    cat <<'MENU'
+  [f] full      terminal setup, plus:
+                  languages  pnpm, python (numpy pandas polars matplotlib seaborn scipy
+                             requests ipykernel), ruby + rails, lua; Linux build libraries
+                  docker     docker + compose (colima VM on macOS), lazydocker
+                  ghostty    terminal emulator config
+  [t] terminal  shell, tmux and Neovim only:
+                  zsh + autosuggestions + syntax-highlighting, starship, tmux, eza, btop
+                  mise, node, neovim, fzf, ripgrep, fd, bat, zoxide, lazygit
+                  Linux: build tools, unzip, wl-clipboard
+  [u] uninstall unlink configs, restore .bak/, remove what install added
+  [q] quit
+MENU
 }
 
 do_install() {
-    choose_profile "$1"
+    [ "$1" = terminal ] && PACKAGES="$TERMINAL_PACKAGES"
     echo "OS: $(uname -s)  |  PM: $PM"
     check_runtime_managers
     install_packages
@@ -269,13 +265,15 @@ do_uninstall() {
 
 choice="$1"
 if [ -z "$choice" ]; then
-    printf "[i]nstall  [u]ninstall  [q]uit: "
+    menu
+    printf "> "
     read -r -n 1 choice || true
     echo
 fi
 case "$choice" in
-i) do_install "$2" ;;
-u) do_uninstall ;;
+f | full) do_install full ;;
+t | terminal) do_install terminal ;;
+u | uninstall) do_uninstall ;;
 q | "") exit 0 ;;
 *)
     echo "Unknown choice: $choice" >&2

@@ -10,16 +10,20 @@ cd ~/dotfiles
 ./bootstrap
 ```
 
-Needs Homebrew on macOS, apt on Ubuntu or dnf on Fedora. On Ubuntu before 24.04, apt has no eza, so bootstrap skips it and prints where to get it. It asks `[i]nstall  [u]ninstall  [q]uit` (one keypress), or pass the letter directly: `./bootstrap i`.
+Needs Homebrew on macOS, apt on Ubuntu or dnf on Fedora. On Ubuntu before 24.04, apt has no eza, so bootstrap skips it and prints where to get it. Run `./bootstrap` for a menu (one keypress), or pass the choice: `./bootstrap f`, `t` or `u`.
 
-**Profiles:** install asks `[f]ull` or `[t]erminal only`, or pass it: `./bootstrap i terminal`. Terminal skips ghostty and Docker; full is everything.
+| Choice | Does |
+|--------|------|
+| `f` full | everything in terminal, plus languages (pnpm, python, ruby + rails, lua), Docker (+ lazydocker) and the Ghostty config |
+| `t` terminal | shell, tmux and Neovim only: zsh + plugins, starship, tmux, eza, btop, mise, node, neovim, fzf, ripgrep, fd, bat, zoxide, lazygit |
+| `u` uninstall | see below |
 
-**Install** (`i`):
+**Install** (`f` or `t`):
 1. Aborts if conflicting runtime managers are found (pyenv, conda, nvm, asdf, rbenv, rvm)
-2. Installs stow and every folder's `packages.txt` (or `packages.brew.txt` / `packages.apt.txt` / `packages.dnf.txt` when present)
-3. Moves any files that would be overwritten into `.bak/`, then symlinks every config into `~`
-4. Installs mise and runs `mise install` (languages, Rails, and the CLI tools)
-5. Full profile only: sets up Docker (adds you to the `docker` group on Linux; on macOS run `colima start`)
+2. Installs stow and each included folder's `packages.txt` (or `packages.brew.txt` / `packages.apt.txt` / `packages.dnf.txt` when present)
+3. Moves any files that would be overwritten into `.bak/`, then symlinks each included config into `~`
+4. Installs mise and runs `mise install` for the included tools
+5. Full only: sets up Docker (adds you to the `docker` group on Linux; on macOS run `colima start`)
 
 It's safe to rerun. Everything it installs is recorded in `.bak/installed`.
 
@@ -33,11 +37,12 @@ It's safe to rerun. Everything it installs is recorded in `.bak/installed`.
 | `zsh` | `.zshrc`, `.zprofile` | zsh, zsh-syntax-highlighting, zsh-autosuggestions |
 | `starship` | prompt | config only (starship comes from mise) |
 | `tmux` | `.tmux.conf` | tmux |
-| `mise` | languages and CLI tools | mise, then everything in `mise/.config/mise/config.toml`: node, python, ruby + rails, neovim, fzf, ripgrep, fd, bat, zoxide, starship, lazygit, lazydocker |
-| `nvim` | neovim config | Linux only: build tools and wl-clipboard |
-| `ghostty` | terminal emulator | config only (full profile) |
-| `docker` | no config | full profile: docker, docker-compose, colima (macOS); docker.io, docker-compose-v2 (Ubuntu); moby-engine, docker-compose (Fedora) |
+| `mise` | CLI tools | mise, then `mise/.config/mise/config.toml`: node, neovim, fzf, ripgrep, fd, bat, zoxide, starship, lazygit |
+| `nvim` | neovim config | Linux only: build tools, unzip and wl-clipboard |
+| `languages` | python packages, mise languages (full) | pnpm, python, ruby + rails, lua; Linux build libraries |
+| `docker` | mise's lazydocker (full) | docker, docker-compose, colima (macOS); docker.io, docker-compose-v2 (Ubuntu); moby-engine, docker-compose (Fedora) |
+| `ghostty` | terminal emulator (full) | config only |
 
 CLI tools go in the mise config so macOS and Linux get the same versions; brew/apt/dnf is only for what mise can't provide.
 
-To add a config, put it in a folder that mirrors its path under `~`, and add that folder to `ALL_PACKAGES` in `bootstrap` (and to the terminal profile in `choose_profile` if it belongs there).
+To add a config, put it in a folder that mirrors its path under `~`, and add that folder to `ALL_PACKAGES` in `bootstrap` (and to `TERMINAL_PACKAGES` if terminal should get it).

@@ -1,13 +1,8 @@
 [tools]
-# Languages
+# Node runs Mason's language servers and formatters
 node = "lts"
-pnpm = "latest"
-python = "latest"
-# Rails goes into this Ruby (not mise's isolated gem: backend, which hides gems from bundle)
-ruby = { version = "latest", postinstall = "gem install rails" }
-lua = "latest"
 
-# CLI tools: same versions on macOS and Ubuntu, newer than apt's
+# CLI tools: same versions on macOS and Linux, newer than the system package manager's
 neovim = "latest"
 fzf = "latest"
 ripgrep = "latest"
@@ -16,4 +11,3 @@ bat = "latest"
 zoxide = "latest"
 starship = "latest"
 lazygit = "latest"
-lazydocker = "latest"

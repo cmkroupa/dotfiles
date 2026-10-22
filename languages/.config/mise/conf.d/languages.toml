@@ -1,0 +1,6 @@
+[tools]
+pnpm = "latest"
+python = "latest"
+# Rails goes into this Ruby (not mise's isolated gem: backend, which hides gems from bundle)
+ruby = { version = "latest", postinstall = "gem install rails" }
+lua = "latest"
