@@ -4,18 +4,24 @@
 set -eo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PACKAGES="shell zsh starship tmux mise nvim ghostty"
+ALL_PACKAGES="shell zsh starship tmux mise nvim ghostty"
+# Profiles: full = everything; terminal = shell, tmux, mise tools and nvim, no GUI or Docker.
+PACKAGES="$ALL_PACKAGES"
+# Dirs that only hold package lists (nothing to stow)
+EXTRA_LISTS="docker"
 # Everything install adds is recorded here so uninstall removes exactly that.
 STATE="$ROOT/.bak/installed"
-# apt packages this Ubuntu doesn't have; listed with install hints at the end
+# apt/dnf packages this Linux doesn't have; listed with install hints at the end
 SKIPPED=""
 
 if command -v brew >/dev/null; then
     PM=brew
 elif command -v apt >/dev/null; then
     PM=apt
+elif command -v dnf >/dev/null; then
+    PM=dnf
 else
-    echo "Error: need Homebrew on macOS (https://brew.sh) or apt on Ubuntu" >&2
+    echo "Error: need Homebrew on macOS (https://brew.sh) apt on Ubuntu or dnf on Fedora" >&2
     exit 1
 fi
 
@@ -54,7 +60,7 @@ package_list() {
     local pkg file
     {
         echo stow
-        for pkg in $PACKAGES; do
+        for pkg in $PACKAGES $EXTRA_LISTS; do
             file="$ROOT/$pkg/packages.$PM.txt"
             [ -f "$file" ] || file="$ROOT/$pkg/packages.txt"
             if [ -f "$file" ]; then
@@ -64,21 +70,30 @@ package_list() {
     } | awk '!seen[$0]++'
 }
 
+# Does this package manager's repo have the package?
+pm_has() {
+    case "$PM" in
+    apt) apt-cache show "$1" >/dev/null 2>&1 ;;
+    dnf) dnf -q list --available "$1" >/dev/null 2>&1 ;;
+    esac
+}
+
 install_packages() {
     local missing="" p
     for p in $(package_list); do
         case "$PM" in
         brew) brew list --formula "$p" >/dev/null 2>&1 || missing="$missing $p" ;;
         apt) dpkg -s "$p" >/dev/null 2>&1 || missing="$missing $p" ;;
+        dnf) rpm -q "$p" >/dev/null 2>&1 || missing="$missing $p" ;;
         esac
     done
     [ -z "$missing" ] && return
-    if [ "$PM" = apt ]; then
+    if [ "$PM" != brew ]; then
         # Older Ubuntu lacks some packages (eza before 24.04); skip them instead of failing the whole install
-        sudo apt update
+        [ "$PM" = apt ] && sudo apt update
         local available=""
         for p in $missing; do
-            if apt-cache show "$p" >/dev/null 2>&1; then available="$available $p"; else SKIPPED="$SKIPPED $p"; fi
+            if pm_has "$p"; then available="$available $p"; else SKIPPED="$SKIPPED $p"; fi
         done
         missing="$available"
         [ -z "$missing" ] && return
@@ -87,6 +102,7 @@ install_packages() {
     case "$PM" in
     brew) HOMEBREW_NO_INSTALL_UPGRADE=1 HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1 brew install $missing ;;
     apt) sudo apt install -y $missing ;;
+    dnf) sudo dnf install -y $missing ;;
     esac
     for p in $missing; do record "$PM $p"; done
 }
@@ -96,7 +112,7 @@ print_skipped() {
     local p
     [ -z "$SKIPPED" ] && return
     echo
-    echo "┌─ Not in apt on this Ubuntu, install by hand:"
+    echo "┌─ Not in $PM on this system, install by hand:"
     for p in $SKIPPED; do
         case "$p" in
         eza) echo "│  eza: https://github.com/eza-community/eza/blob/main/INSTALL.md" ;;
@@ -139,19 +155,46 @@ install_mise() {
     mise install || echo "  warning: 'mise install' failed; rerun it later" >&2
 }
 
-use_zsh() {
-    [ "$(basename "$SHELL")" = zsh ] && return
-    echo "Switching your login shell to zsh"
-    chsh -s /bin/zsh
+# Docker needs the daemon reachable: a docker group on Linux, a colima VM on macOS.
+setup_docker() {
+    case " $EXTRA_LISTS " in *" docker "*) ;; *) return ;; esac
+    if [ "$PM" != brew ]; then
+        # Fedora's moby-engine ships a disabled daemon; Ubuntu's docker.io starts itself
+        [ "$PM" = dnf ] && sudo systemctl enable --now docker
+        sudo usermod -aG docker "$USER" && echo "  added $USER to the docker group (log out and back in)"
+    else
+        echo "  start Docker with: colima start"
+    fi
+}
+
+choose_profile() {
+    local profile="$1"
+    if [ -z "$profile" ]; then
+        printf "Profile: [f]ull  [t]erminal only (no ghostty or docker): "
+        read -r -n 1 profile || true
+        echo
+    fi
+    case "$profile" in
+    f | full | "") ;;
+    t | terminal)
+        PACKAGES="shell zsh starship tmux mise nvim"
+        EXTRA_LISTS=""
+        ;;
+    *)
+        echo "Unknown profile: $profile" >&2
+        exit 1
+        ;;
+    esac
 }
 
 do_install() {
+    choose_profile "$1"
     echo "OS: $(uname -s)  |  PM: $PM"
     check_runtime_managers
     install_packages
     link_packages
     install_mise
-    use_zsh
+    setup_docker
     echo "Done. Open a new terminal."
     print_skipped
 }
@@ -176,12 +219,13 @@ keep() {
 }
 
 do_uninstall() {
-    local brew_pkgs apt_pkgs mise="" removing answer pkg p apt_remove=""
+    local brew_pkgs apt_pkgs dnf_pkgs mise="" removing answer pkg p apt_remove=""
     brew_pkgs="$(recorded brew)"
     apt_pkgs="$(recorded apt)"
+    dnf_pkgs="$(recorded dnf)"
     grep -qx mise "$STATE" 2>/dev/null && mise=1
 
-    removing="$brew_pkgs$apt_pkgs${mise:+mise (and every tool it installed) }"
+    removing="$brew_pkgs$apt_pkgs$dnf_pkgs${mise:+mise (and every tool it installed) }"
     echo "Unlinks every config and restores files moved into .bak/."
     [ -n "$removing" ] && echo "Also removes what install added: $removing"
     if [ -t 0 ]; then
@@ -194,7 +238,7 @@ do_uninstall() {
         esac
     fi
 
-    for pkg in $PACKAGES; do
+    for pkg in $ALL_PACKAGES; do
         if stow_cmd -D "$pkg" 2>/dev/null; then
             echo "  unlinked: $pkg"
         else
@@ -211,6 +255,9 @@ do_uninstall() {
         brew uninstall "$p" >/dev/null && echo "  removed: $p" || echo "  could not remove: $p" >&2
     done
     for p in $apt_pkgs; do keep "$p" || apt_remove="$apt_remove $p"; done
+    local dnf_remove=""
+    for p in $dnf_pkgs; do keep "$p" || dnf_remove="$dnf_remove $p"; done
+    [ -z "$dnf_remove" ] || { sudo dnf remove -y $dnf_remove && echo "  removed:$dnf_remove"; }
     [ -z "$apt_remove" ] || { sudo apt remove -y $apt_remove && echo "  removed:$apt_remove"; }
 
     rm -f "$STATE"
@@ -227,7 +274,7 @@ if [ -z "$choice" ]; then
     echo
 fi
 case "$choice" in
-i) do_install ;;
+i) do_install "$2" ;;
 u) do_uninstall ;;
 q | "") exit 0 ;;
 *)

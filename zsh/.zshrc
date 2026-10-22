@@ -30,7 +30,7 @@ command -v zoxide &>/dev/null && eval "$(zoxide init zsh --cmd cd)"
 # tmux's ⌥r sends URG (ignored by default, so shells without this trap are safe): reload this file and redraw the prompt
 TRAPURG() { source ~/.zshrc; zle && zle reset-prompt; }
 
-# ── Plugins (Homebrew or apt) ─────────────────────────────────────────────────
+# ── Plugins (Homebrew, apt or dnf) ─────────────────────────────────────────────────
 # syntax-highlighting goes last so it sees every widget defined above
 for plugin in zsh-autosuggestions zsh-syntax-highlighting; do
   for dir in /opt/homebrew/share /usr/share; do

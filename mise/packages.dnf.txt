@@ -1,0 +1,9 @@
+# mise builds Ruby from source on Linux (Fedora already ships curl)
+gcc
+gcc-c++
+make
+openssl-devel
+libyaml-devel
+zlib-devel
+libffi-devel
+readline-devel

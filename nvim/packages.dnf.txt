@@ -1,0 +1,6 @@
+# to build telescope-fzf-native and unpack Mason tools; wl-clipboard for the system clipboard
+gcc
+gcc-c++
+make
+unzip
+wl-clipboard

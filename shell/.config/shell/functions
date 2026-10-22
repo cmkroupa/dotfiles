@@ -10,8 +10,10 @@ function keys() {
 function update() {
   if command -v brew &>/dev/null; then
     brew update && brew upgrade
-  else
+  elif command -v apt &>/dev/null; then
     sudo apt update && sudo apt upgrade -y && mise self-update --yes
+  else
+    sudo dnf upgrade -y && mise self-update --yes
   fi
   mise upgrade
   nvim --headless "+Lazy! sync" +qa

@@ -1,0 +1,4 @@
+# headless Docker: colima is the VM, docker is the CLI
+docker
+docker-compose
+colima

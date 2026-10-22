@@ -3,8 +3,8 @@
 node = "lts"
 pnpm = "latest"
 python = "latest"
-ruby = "latest"
-"gem:rails" = "latest"
+# Rails goes into this Ruby (not mise's isolated gem: backend, which hides gems from bundle)
+ruby = { version = "latest", postinstall = "gem install rails" }
 lua = "latest"
 
 # CLI tools: same versions on macOS and Ubuntu, newer than apt's
