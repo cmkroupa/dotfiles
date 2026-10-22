@@ -4,8 +4,8 @@
 set -eo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# Each folder is a stow package and may hold a packages.<pm>.txt. Terminal installs the first
-# set; full adds languages (pnpm, python, ruby, lua + build libraries), docker and ghostty.
+# Each folder is a stow package and may hold a packages.<pm>.txt. Headless installs the first
+# set; install adds languages (pnpm, python, ruby, lua + build libraries), docker and ghostty.
 TERMINAL_PACKAGES="shell zsh starship tmux mise nvim"
 ALL_PACKAGES="$TERMINAL_PACKAGES languages docker ghostty"
 PACKAGES="$ALL_PACKAGES"
@@ -169,22 +169,17 @@ setup_docker() {
 
 menu() {
     cat <<'MENU'
-  [f] full      terminal setup, plus:
-                  languages  pnpm, python (numpy pandas polars matplotlib seaborn scipy
-                             requests ipykernel), ruby + rails, lua; Linux build libraries
-                  docker     docker + compose (colima VM on macOS), lazydocker
-                  ghostty    terminal emulator config
-  [t] terminal  shell, tmux and Neovim only:
-                  zsh + autosuggestions + syntax-highlighting, starship, tmux, eza, btop
-                  mise, node, neovim, fzf, ripgrep, fd, bat, zoxide, lazygit
-                  Linux: build tools, unzip, wl-clipboard
-  [u] uninstall unlink configs, restore .bak/, remove what install added
+  [h] headless   terminal tools only: zsh, tmux, neovim, starship, fzf, ripgrep, fd, bat,
+                 zoxide, lazygit, eza, btop, node
+  [i] install    everything in headless, plus pnpm, python, ruby + rails, lua,
+                 docker + lazydocker, and the ghostty config
+  [u] uninstall  unlink configs, restore .bak/, remove what install added
   [q] quit
 MENU
 }
 
 do_install() {
-    [ "$1" = terminal ] && PACKAGES="$TERMINAL_PACKAGES"
+    [ "$1" = headless ] && PACKAGES="$TERMINAL_PACKAGES"
     echo "OS: $(uname -s)  |  PM: $PM"
     check_runtime_managers
     install_packages
@@ -271,8 +266,8 @@ if [ -z "$choice" ]; then
     echo
 fi
 case "$choice" in
-f | full) do_install full ;;
-t | terminal) do_install terminal ;;
+i | install) do_install full ;;
+h | headless) do_install headless ;;
 u | uninstall) do_uninstall ;;
 q | "") exit 0 ;;
 *)

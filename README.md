@@ -10,20 +10,20 @@ cd ~/dotfiles
 ./bootstrap
 ```
 
-Needs Homebrew on macOS, apt on Ubuntu or dnf on Fedora. On Ubuntu before 24.04, apt has no eza, so bootstrap skips it and prints where to get it. Run `./bootstrap` for a menu (one keypress), or pass the choice: `./bootstrap f`, `t` or `u`.
+Needs Homebrew on macOS, apt on Ubuntu or dnf on Fedora. On Ubuntu before 24.04, apt has no eza, so bootstrap skips it and prints where to get it. Run `./bootstrap` for a menu (one keypress), or pass the choice: `./bootstrap h`, `i` or `u`.
 
 | Choice | Does |
 |--------|------|
-| `f` full | everything in terminal, plus languages (pnpm, python, ruby + rails, lua), Docker (+ lazydocker) and the Ghostty config |
-| `t` terminal | shell, tmux and Neovim only: zsh + plugins, starship, tmux, eza, btop, mise, node, neovim, fzf, ripgrep, fd, bat, zoxide, lazygit |
+| `h` headless | terminal tools only: zsh + plugins, starship, tmux, eza, btop, mise, node, neovim, fzf, ripgrep, fd, bat, zoxide, lazygit |
+| `i` install | everything in headless, plus pnpm, python, ruby + rails, lua, Docker (+ lazydocker) and the Ghostty config |
 | `u` uninstall | see below |
 
-**Install** (`f` or `t`):
+**Install** (`h` or `i`):
 1. Aborts if conflicting runtime managers are found (pyenv, conda, nvm, asdf, rbenv, rvm)
 2. Installs stow and each included folder's `packages.txt` (or `packages.brew.txt` / `packages.apt.txt` / `packages.dnf.txt` when present)
 3. Moves any files that would be overwritten into `.bak/`, then symlinks each included config into `~`
 4. Installs mise and runs `mise install` for the included tools
-5. Full only: sets up Docker (adds you to the `docker` group on Linux; on macOS run `colima start`)
+5. `i` only: sets up Docker (adds you to the `docker` group on Linux; on macOS run `colima start`)
 
 It's safe to rerun. Everything it installs is recorded in `.bak/installed`.
 
@@ -39,10 +39,10 @@ It's safe to rerun. Everything it installs is recorded in `.bak/installed`.
 | `tmux` | `.tmux.conf` | tmux |
 | `mise` | CLI tools | mise, then `mise/.config/mise/config.toml`: node, neovim, fzf, ripgrep, fd, bat, zoxide, starship, lazygit |
 | `nvim` | neovim config | Linux only: build tools, unzip and wl-clipboard |
-| `languages` | python packages, mise languages (full) | pnpm, python, ruby + rails, lua; Linux build libraries |
-| `docker` | mise's lazydocker (full) | docker, docker-compose, colima (macOS); docker.io, docker-compose-v2 (Ubuntu); moby-engine, docker-compose (Fedora) |
-| `ghostty` | terminal emulator (full) | config only |
+| `languages` | python packages, mise languages (`i` only) | pnpm, python, ruby + rails, lua; Linux build libraries |
+| `docker` | mise's lazydocker (`i` only) | docker, docker-compose, colima (macOS); docker.io, docker-compose-v2 (Ubuntu); moby-engine, docker-compose (Fedora) |
+| `ghostty` | terminal emulator (`i` only) | config only |
 
 CLI tools go in the mise config so macOS and Linux get the same versions; brew/apt/dnf is only for what mise can't provide.
 
-To add a config, put it in a folder that mirrors its path under `~`, and add that folder to `ALL_PACKAGES` in `bootstrap` (and to `TERMINAL_PACKAGES` if terminal should get it).
+To add a config, put it in a folder that mirrors its path under `~`, and add that folder to `ALL_PACKAGES` in `bootstrap` (and to `TERMINAL_PACKAGES` if headless should get it).
