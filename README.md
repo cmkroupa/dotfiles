@@ -33,6 +33,7 @@ It's safe to rerun. Everything it installs is recorded in `.bak/installed`.
 
 | Folder | Config for | Installs |
 |--------|------------|----------|
+| `bash` | `.bashrc` | nothing; starts zsh from interactive bash, so you needn't change your login shell |
 | `shell` | shared aliases, `keys`, `update` | eza, btop |
 | `zsh` | `.zshrc`, `.zprofile` | zsh, zsh-syntax-highlighting, zsh-autosuggestions |
 | `starship` | prompt | config only (starship comes from mise) |

@@ -6,7 +6,7 @@ set -eo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Each folder is a stow package and may hold a packages.<pm>.txt. Headless installs the first
 # set; install adds languages (bun, python, ruby, lua + build libraries), docker and ghostty.
-TERMINAL_PACKAGES="shell zsh starship tmux mise nvim"
+TERMINAL_PACKAGES="bash shell zsh starship tmux mise nvim"
 ALL_PACKAGES="$TERMINAL_PACKAGES languages docker ghostty"
 PACKAGES="$ALL_PACKAGES"
 # Everything install adds is recorded here so uninstall removes exactly that.
